@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - XIS</title>
+
+    <link rel="stylesheet" href="assets/bootstrap-5.3.3-dist/css/bootstrap.min.css">
+</head>
+<body class="bg-body-secondary">
+    <header class="bg-white px-3">
+        <a href="index.html">
+            <img src="assets/img/logo.png" alt="" width="150px">
+        </a>
+    </header>
+    <div class="container-fluid p-3">
+        <div class="row">
+            <div class="col-3">
+                <Select class="form-select">
+                    <option value="" selected>Programação Linear</option>
+                </Select>
+            </div>
+        </div>
+        
+        <div class="p-3 my-3">
+            <div class="mb-3 row">
+                <label for="numVariavel" class="col-2 col-form-label">Nº de variáveis</label>
+                <div class="col-1">
+                  <input type="number" class="form-control" id="numVariavel" min="1" max="3" value="1">
+                </div>
+            </div>
+            <div class="mb-3 row">
+                <label for="numRestricao" class="col-2 col-form-label">Nº de restrições</label>
+                <div class="col-1">
+                  <input type="number" class="form-control" id="numRestricao" min="1" value="1">
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center">
+            <h5>Entrada de dados</h5>
+        </div>
+    </div>
+    <footer class="fixed-bottom text-center bg-white">
+        <p>Copyright &copy; XIS 2024</p>
+    </footer>
+</body>
+
+<script src="assets/bootstrap-5.3.3-dist/js/bootstrap.bundle.min.js"></script>
+</html>
