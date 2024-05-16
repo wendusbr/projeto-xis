@@ -91,9 +91,6 @@ td, tr, option, .form-select{
 }
 
 .menu li:not(:first-child) a{
-    /* border-right:1px solid #000000; */
-    /* border-left:1px solid #000000; */
-    /* margin: 0px 1px; */
     border-left:1px solid #000000;
 }
 
@@ -135,8 +132,6 @@ td, tr, option, .form-select{
 
 .menu li ul{
     position:absolute;
-    /* top:25px; */
-    /* left:0; */
     background-color:#fff;
     display:none;
     margin: 0px;
@@ -150,5 +145,4 @@ td, tr, option, .form-select{
 .menu li ul li{
     border:1px solid #c0c0c0;
     display:block;
-    /* width:150px; */
 }
