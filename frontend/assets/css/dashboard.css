@@ -150,5 +150,5 @@ td, tr, option, .form-select{
 .menu li ul li{
     border:1px solid #c0c0c0;
     display:block;
-    width:150px;
+    /* width:150px; */
 }
