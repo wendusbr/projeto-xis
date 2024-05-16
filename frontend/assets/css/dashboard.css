@@ -66,14 +66,20 @@ td, tr, option, .form-select{
     text-align: center;
 }
 
+#metodos{
+    justify-content: center;
+}
+
 .alinhamentoGeral{
     align-items: center;
     align-content: center;
     flex-wrap: wrap;
+    max-width: 330px;
 }
 
 #selectMetodo{
     align-content: flex-end;
+    max-width: 521px;
 }
 
 .menu {
