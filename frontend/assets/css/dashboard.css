@@ -1,0 +1,148 @@
+#modelagemTabelar th{
+    background-color: #0275D8;
+    color: white;
+}
+
+#modelagemTabelar{
+    max-width: 80vw;
+    border-color: black;
+}
+
+#modelagemTabelar tbody tr td, #modelagemTabelar thead tr th{
+    max-width: 150px;
+    min-width: 70px;
+    max-height: 45px;
+    height: 45px;
+}
+
+.form-control:focus {
+    color: var(--bs-body-color);
+    background-color: var(--bs-body-bg);
+    border-color: #86b7fe;
+    outline: 0;
+    box-shadow: 0 0 0 0.25rem rgba(13,110,253,0);
+}
+
+td input, tr input{
+    width: 100%;
+    height: 100%;
+    border-radius: 0px;
+}
+
+td, tr, option, .form-select{
+    font-weight: 500;
+}
+
+.vertical {
+    vertical-align: middle;
+    display: table-cell;
+}
+
+#numRestricao, #numVariavel{
+    min-width: 55px;
+    max-width: 70px;
+}
+
+#metodo{
+    max-width: 280px;
+}
+
+#l1, #l2{
+    max-width: 210px;
+}
+
+#metodo-gerador{
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: nowrap;
+}
+
+#gerarTabela{
+    width: 150px;
+}
+
+#text{
+    font-size: 24px;
+    text-align: center;
+}
+
+.alinhamentoGeral{
+    align-items: center;
+    align-content: center;
+    flex-wrap: wrap;
+}
+
+#selectMetodo{
+    align-content: flex-end;
+}
+
+.menu {
+    list-style: none;
+    border: 1.3px solid #000000;
+    border-radius: 12px;
+    display: flex;
+    padding: 0;
+}
+
+.menu li:not(:first-child) a{
+    /* border-right:1px solid #000000; */
+    /* border-left:1px solid #000000; */
+    /* margin: 0px 1px; */
+    border-left:1px solid #000000;
+}
+
+.menu li{
+    background-color: white;
+}
+
+.menu li:first-child{
+    border-radius: 12px 0px 0px 12px;
+    background-color: white;
+}
+
+.menu li:last-child{
+    border-radius: 0px 12px 12px 0px;
+    background-color: white;
+}
+
+
+.menu li a{
+    color:#333; 
+    text-decoration:none; 
+    padding:5px 30px;
+    display:block;
+}
+.menu li:first-child a:hover{
+    border-radius: 12px 0px 0px 12px;
+}
+
+.menu li:last-child a:hover{
+    border-radius: 0px 12px 12px 0px;
+}
+
+.menu li a:hover{
+    background:#0275D8;
+    color:#fff;
+    box-shadow:0 3px 10px 0 #CCC;
+    text-shadow:0px 0px 5px #fff;
+}
+
+.menu li ul{
+    position:absolute;
+    /* top:25px; */
+    /* left:0; */
+    background-color:#fff;
+    display:none;
+    margin: 0px;
+    padding: 0px;
+}
+
+.menu li:hover ul, .menu li.over ul{
+    display:block;
+}
+
+.menu li ul li{
+    border:1px solid #c0c0c0;
+    display:block;
+    width:150px;
+}
