@@ -44,18 +44,57 @@ function simplexTable(entrada){
     return tabelaSimplex;
 }
 
-function simplexMax(){
-    var entrada = [[50, 80, 0], [1, 2, 120], [1, 1, 90]];
-    var entrada2 = [[8, 25, 0],[2,5,120], [0,3,60],[4,5,200]];
-    var entrada3 = [[3,5,0],[1,0,4],[0,2,12],[3,2,18]] ;
+function simplexMax(entrada, numVariaveis, numRestricoes){
+    // var entrada = [[50, 80, 0], [1, 2, 120], [1, 1, 90]];
+    // var entrada2 = [[8, 25, 0],[2,5,120], [0,3,60],[4,5,200]];
+    // var entrada3 = [[3,5,0],[1,0,4],[0,2,12],[3,2,18]] ;
 
-    const numVariaveis = 2;
     let tabelaSimplex = simplexTable(entrada);
-    let valoresVariaveis = [];
-
-    for(let i=0; i<numVariaveis; i++)
-        valoresVariaveis.push(tabelaSimplex[0][i+1]);
-
-    console.log(valoresVariaveis);
     
+    while(1){
+        // Descobrir coluna pivotal
+        let pesoZ=0, colunaPivotal;
+        for(let i=1; i<=numVariaveis; i++){
+            if(tabelaSimplex[0][i] < pesoZ){
+                pesoZ = tabelaSimplex[0][i];
+                colunaPivotal = i;
+            }
+        }
+
+        if(pesoZ == 0)
+            return;
+
+        // Descobrir linha pivotal
+        let pesoRestricao, linhaPivotal;
+        for(let i=1; i<=numRestricoes; i++){
+            // Não se divide entre números negativos
+            if(tabelaSimplex[i][tabelaSimplex[0].length-1] > 0 && tabelaSimplex[i][colunaPivotal] > 0){
+                if(!pesoRestricao || tabelaSimplex[i][tabelaSimplex[0].length-1]/tabelaSimplex[i][colunaPivotal] < pesoRestricao){
+                    pesoRestricao = tabelaSimplex[i][tabelaSimplex[0].length-1]/tabelaSimplex[i][colunaPivotal];
+                    linhaPivotal = i;
+                }
+            }
+        }
+
+        let elementoPivotal = tabelaSimplex[linhaPivotal][colunaPivotal];
+
+        // Divide toda linha pivotal pelo elemento pivotal
+        if(elementoPivotal != 1){
+            for(let i=0; i<tabelaSimplex[0].length; i++)
+                tabelaSimplex[linhaPivotal][i] /= elementoPivotal;
+        }
+
+        // Escalonamento
+        let coeficiente;
+        for(let i=0; i<tabelaSimplex.length; i++){
+            if(i != linhaPivotal){
+                coeficiente = tabelaSimplex[i][colunaPivotal];
+                for(let j=0; j<tabelaSimplex[0].length; j++){
+                    tabelaSimplex[i][j] += -coeficiente*tabelaSimplex[linhaPivotal][j];
+                }
+            }
+        }
+
+        console.log(tabelaSimplex);
+    }
 }
