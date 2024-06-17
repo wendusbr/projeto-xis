@@ -1,4 +1,4 @@
-function simplexTable(entrada){
+function simplexMaxTable(entrada){
     const numVariaveis = entrada[0].length-1;
     const numRestricoes = entrada.length-1;
     let identidade = 1;
@@ -8,8 +8,7 @@ function simplexTable(entrada){
     const colunas = numVariaveis + numRestricoes + 2; // 2 => coluna Z e LD
 
     for(let i=0; i<linhas; i++){
-        // Inicializa linha
-        tabelaSimplex.push([]);
+        tabelaSimplex.push([]); // Inicializa linha
 
         for(let j=0; j<colunas; j++){
             // Se primeira coluna (Z)
@@ -49,7 +48,7 @@ function simplexMax(entrada, numVariaveis, numRestricoes){
     // var entrada2 = [[8, 25, 0],[2,5,120], [0,3,60],[4,5,200]];
     // var entrada3 = [[3,5,0],[1,0,4],[0,2,12],[3,2,18]] ;
 
-    let tabelaSimplex = simplexTable(entrada);
+    let tabelaSimplex = simplexMaxTable(entrada);
     
     while(1){
         // Descobrir coluna pivotal
@@ -97,4 +96,72 @@ function simplexMax(entrada, numVariaveis, numRestricoes){
 
         console.log(tabelaSimplex);
     }
+}
+
+// var entrada = [[3,8,0], [1,4,3.5], [1,2,2.5]]
+// [3 8 0]
+// [1 4 3.5]
+// [1 2 2.5]
+function simplexMinTable(entrada){
+    const numVariaveis = entrada[0].length-1;
+    const numRestricoes = entrada.length-1;
+    const linhas = numVariaveis;
+    const colunas = numVariaveis + numRestricoes*2 + 1;
+
+    let M = 100;
+
+    // Montagem da linha Z
+    let Z = [];
+    for(let i=0; i<colunas; i++){
+        if(i < entrada[0].length-1)
+            Z[i] = entrada[0][i];
+        else{
+            Z[i] = 0; // variável auxiliar
+            i++;
+            Z[i] = M; // variável artificial
+        }
+    }
+
+    // Montagem matricial das equações referentes às restrições
+    let identidade = 0;
+    let tabelaSimplex = [];
+    for(let i=0; i<linhas; i++){
+        tabelaSimplex.push([]); // Inicializa linha
+
+        for(let j=0; j<colunas; j++){
+            if(j < entrada[0].length-1)
+                tabelaSimplex[i][j] = entrada[i+1][j];
+            else if(j < colunas-1){
+                if(i==identidade && j==numVariaveis+identidade*2){
+                    tabelaSimplex[i][j] = -1;
+                    j++;
+                    tabelaSimplex[i][j] = 1;
+                    identidade++;
+                }
+                else
+                    tabelaSimplex[i][j] = 0;
+            }
+            else
+                tabelaSimplex[i][j] = entrada[i+1][entrada[0].length-1];
+        }
+    }
+
+    // Vetor de coeficentes das variáveis na base
+    let coefientes = [];
+    for(let i=0; i<numRestricoes; i++)
+        coefientes[i] = M;
+
+    let result = [Z, tabelaSimplex, coefientes];
+
+    return result;
+}
+
+function simplexMin(entrada){
+    let result = simplexMinTable(entrada);
+
+    let Z = result[0];
+    let tabelaSimplex = result[1];
+    let coeficentes = result[2];
+
+    console.log(Z, tabelaSimplex, coeficentes);
 }
