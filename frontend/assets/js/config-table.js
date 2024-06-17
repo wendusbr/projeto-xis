@@ -77,7 +77,7 @@ $(document).ready(() =>{
         tabelaDinamica += "<td>Limites Superiores</td>"
             for(var j = 1; j <= $('#numVariavel').val() ; j++){
                 tabelaDinamica +=  "<td>" +
-                '<input style="border: none;" type="number" class="form-control" data-id="limSuperior" id="limSuperior" aria-describedby="basic-addon3 basic-addon4" maxlength="8"></input>' +
+                '<input style="border: none;" type="text" class="form-control" data-id="limSuperior" id="limSuperior" aria-describedby="basic-addon3 basic-addon4" maxlength="8" value="Inf"></input>' +
                 "</td>";
             }
         tabelaDinamica += "<td></td><td></td>" +
@@ -87,7 +87,7 @@ $(document).ready(() =>{
         "<td>Limites Inferiores</td>";
             for(var j = 1; j <= $('#numVariavel').val() ; j++){
                 tabelaDinamica +=  "<td>" +
-                '<input style="border: none;" type="number" class="form-control" data-id="limInferior" id="limInferior" aria-describedby="basic-addon3 basic-addon4" maxlength="8"></input>' +
+                '<input style="border: none;" type="number" class="form-control" data-id="limInferior" id="limInferior" aria-describedby="basic-addon3 basic-addon4" maxlength="8" value="0"></input>' +
                 "</td>";
             }
         tabelaDinamica += "<td></td><td></td>" +
@@ -95,5 +95,20 @@ $(document).ready(() =>{
 
         tabelaDinamica += "</tbody></table>";
         $('#inputTabela').html(tabelaDinamica);
+    });
+});
+
+$(document).ready(function() {
+    $('#myButton').click(function() {
+        $.ajax({
+            url: 'https://jsonplaceholder.typicode.com/todos/1',
+            type: 'GET',
+            success: function(response) {
+                $('#response').text(JSON.stringify(response, null, 2));
+            },
+            error: function(error) {
+                $('#response').text('An error occurred');
+            }
+        });
     });
 });

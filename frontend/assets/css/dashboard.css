@@ -68,6 +68,7 @@ td, tr, option, .form-select{
 
 #metodos{
     justify-content: center;
+    margin-bottom: 99px;
 }
 
 .alinhamentoGeral{
@@ -90,7 +91,7 @@ td, tr, option, .form-select{
     padding: 0;
 }
 
-.menu li:not(:first-child) a{
+.menu li:not(:first-child):not(.sub) a{
     border-left:1px solid #000000;
 }
 
@@ -98,12 +99,12 @@ td, tr, option, .form-select{
     background-color: white;
 }
 
-.menu li:first-child{
+.menu li:first-child:not(.sub){
     border-radius: 12px 0px 0px 12px;
     background-color: white;
 }
 
-.menu li:last-child{
+.menu li:last-child:not(.sub){
     border-radius: 0px 12px 12px 0px;
     background-color: white;
 }
@@ -115,11 +116,11 @@ td, tr, option, .form-select{
     padding:5px 30px;
     display:block;
 }
-.menu li:first-child a:hover{
+.menu li:first-child a:hover:not(.sub){
     border-radius: 12px 0px 0px 12px;
 }
 
-.menu li:last-child a:hover{
+.menu li:last-child a:hover:not(.sub){
     border-radius: 0px 12px 12px 0px;
 }
 
@@ -139,10 +140,24 @@ td, tr, option, .form-select{
 }
 
 .menu li:hover ul, .menu li.over ul{
-    display:block;
+    display: block;
 }
 
 .menu li ul li{
     border:1px solid #c0c0c0;
     display:block;
+}
+
+#sub-metodos{
+    margin-bottom: 50px;
+}
+
+@media screen and (min-width: 1010px) and (max-width: 1240px){
+    #btnVoltar{
+        margin-bottom: .25rem !important;
+    }
+}
+
+body{
+    min-width: 595px;
 }
