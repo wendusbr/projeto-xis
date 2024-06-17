@@ -1,3 +1,9 @@
+@charset "UTF-8";
+
+body{
+    min-width: 595px;
+}
+
 #modelagemTabelar th{
     background-color: #0275D8;
     color: white;
@@ -116,6 +122,7 @@ td, tr, option, .form-select{
     padding:5px 30px;
     display:block;
 }
+
 .menu li:first-child a:hover:not(.sub){
     border-radius: 12px 0px 0px 12px;
 }
@@ -158,6 +165,18 @@ td, tr, option, .form-select{
     }
 }
 
-body{
-    min-width: 595px;
+.activeView {
+    background-color:#920686;
+    color: black;
+    text-shadow:0px 0px 5px #fff;
+    font-weight: bold;
+    font-size: 15px;
+}
+
+.activeView:first-child a:hover:not(.sub){
+    border-radius: 12px 0px 0px 12px;
+}
+
+.activeView:last-child a:hover:not(.sub){
+    border-radius: 0px 12px 12px 0px;
 }
