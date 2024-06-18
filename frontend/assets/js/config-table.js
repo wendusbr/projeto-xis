@@ -91,52 +91,67 @@ $(document).ready(() =>{
     atualizarDisponibilidadeMetodoGrafico();
 
     $("#gerarSolucao").on('click', function () {
-      const activeElements = $('.menu li a.active');
-      if (activeElements.length === 0) {
-        alert('Nenhum método selecionado.\nPor favor, selecione um método para gerar a solução.');
-        return; // Prevent further execution if no active elements are found
-      }
+        // Captura o número de variáveis e restrições
+        var numVariaveis = parseInt($('#numVariavel').val());
+        var numRestricoes = parseInt($('#numRestricao').val());
 
-      // Array para armazenar todos os dados
-      var dados = [];
-  
-      // ------------- Dados Iniciais -------------
-      var dadosIniciais = [
-        { "id": "min-max", "value": $("#min-max").val() },
-        { "id": "Z-x1", "value": $("#Z-x1").val() },
-        { "id": "Z-x2", "value": $("#Z-x2").val() }
-      ];
-      dados.push({ "id": "dados-iniciais", "value": dadosIniciais });
-  
-      // ------------- Valores das Restrições -------------
-      for (var i = 1; i <= $('#numRestricao').val(); i++) {
-        var restricao = [];
-        for (var j = 1; j <= $('#numVariavel').val(); j++) {
-          restricao.push({ "id": "r" + i + "x" + j, "value": $("#r" + i + "x" + j).val() });
+        // Captura o tipo de problema (max ou min)
+        var tipoProblema = $("#min-max").val() === "2" ? "min" : "max";
+
+        // Array para armazenar os coeficientes da função objetivo Z
+        var z = [];
+        for (var i = 1; i <= numVariaveis; i++) {
+            z.push(parseFloat($("#Z-x" + i).val()));
         }
-        restricao.push({ "id": "r" + i, "value": $("#r" + i).val() });
-        restricao.push({ "id": "RSH" + i, "value": $("#RSH" + i).val() });
-        dados.push({ "id": "r" + i, "value": restricao });
-      }
-  
-      // ------------- Limites -------------
-      var limites = [
-        { "id": "limSuperiorX1", "value": $("#limSuperiorX1").val() },
-        { "id": "limSuperiorX2", "value": $("#limSuperiorX2").val() },
-        { "id": "limInferiorX1", "value": $("#limInferiorX1").val() },
-        { "id": "limInferiorX2", "value": $("#limInferiorX2").val() }
-      ];
-      dados.push({ "id": "limites", "value": limites });
-  
-      if(activeElements.attr('id') == "a2" && !($('#lin2').hasClass('disabled'))) {
-        EnviarParaMetodoGrafico(dados);
-      } else if(activeElements.attr('id') == "a4"){
-        chamarConversor(dados);
-      } else if(activeElements.attr('id') == "a1"){
-        console.log('Array final:', dados);
-      } else{
-        alert('Método selecionado inválido!\nTente novamente');
-      }
+
+        // Array para armazenar as restrições
+        var restricoes = [];
+        for (var i = 1; i <= numRestricoes; i++) {
+            var restricao = [];
+            for (var j = 1; j <= numVariaveis; j++) {
+                restricao.push(parseFloat($("#r" + i + "x" + j).val()));
+            }
+            var tipoRestricao = $("#r" + i).val();
+            if (tipoRestricao === "1") {
+                restricao.unshift("<=");
+            } else if (tipoRestricao === "2") {
+                restricao.unshift("<");
+            } else if (tipoRestricao === "3") {
+                restricao.unshift(">=");
+            } else if (tipoRestricao === "4") {
+                restricao.unshift(">");
+            } else if (tipoRestricao === "5") {
+                restricao.unshift("=");
+            }
+            restricao.push(parseFloat($("#RSH" + i).val()));
+            restricoes.push(restricao);
+        }
+
+        // Objeto final no formato desejado
+        var novoObjeto = {
+            numVariaveis: numVariaveis,
+            numRestricoes: numRestricoes,
+            tipo: tipoProblema,
+            z: z,
+            restricoes: restricoes
+        };
+
+        // Verifica qual método está ativo e executa a função correspondente
+        const activeElements = $('.menu li a.active');
+        if (activeElements.length === 0) {
+            alert('Nenhum método selecionado.\nPor favor, selecione um método para gerar a solução.');
+            return; // Prevent further execution if no active elements are found
+        }
+
+        if (activeElements.attr('id') == "a2" && !($('#lin2').hasClass('disabled'))) {
+            EnviarParaMetodoGrafico(novoObjeto);
+        } else if (activeElements.attr('id') == "a4") {
+            chamarConversor(novoObjeto);
+        } else if (activeElements.attr('id') == "a1") {
+            console.log('Novo objeto:', novoObjeto);
+        } else {
+            alert('Método selecionado inválido!\nTente novamente');
+        }
     });
 
     $('.menu li a').click(function(event) {
