@@ -83,6 +83,8 @@ function simplexMax(entrada, numVariaveis, numRestricoes){
                 tabelaSimplex[linhaPivotal][i] /= elementoPivotal;
         }
 
+        document.getElementById('modelagem-passos').innerHTML += gerarTabelaIteracao(1, tabelaSimplex);
+
         // Escalonamento
         let coeficiente;
         for(let i=0; i<tabelaSimplex.length; i++){
@@ -94,10 +96,11 @@ function simplexMax(entrada, numVariaveis, numRestricoes){
             }
         }
 
+        document.getElementById('modelagem-passos').innerHTML += gerarTabelaIteracao(2, tabelaSimplex);
         console.log(tabelaSimplex);
     }
 }
-
+simplexMax(exemploEntrada , 2, 2);
 // var entrada = [[3,8,0], [1,4,3.5], [1,2,2.5]]
 // [3 8 0]
 // [1 4 3.5]
@@ -165,3 +168,38 @@ function simplexMin(entrada){
 
     console.log(Z, tabelaSimplex, coeficentes);
 }
+
+function gerarTabelaIteracao(iteracao, tabelaSimplex) {
+    let html = `<h4>Iteração ${iteracao}</h4>`;
+    html += '<table class="table table-bordered">';
+    html += '<thead><tr>';
+
+    // Cabeçalho das variáveis não-básicas
+    html += '<th scope="col">Ignore</th>';
+    for (let i = 1; i < tabelaSimplex[0].length - 1; i++) {
+        if (i <= tabelaSimplex[0].length - 2 - (tabelaSimplex.length - 1)) {
+            html += `<th scope="col">x${i}</th>`;
+        } else {
+            html += `<th scope="col">s${i - (tabelaSimplex[0].length - 2 - (tabelaSimplex.length - 1))}</th>`;
+        }
+    }
+
+    // Cabeçalho da última coluna (RSH)
+    html += '<th scope="col">RSH</th>';
+    html += '</tr></thead>';
+    html += '<tbody>';
+
+    // Conteúdo das linhas
+    for (let i = 0; i < tabelaSimplex.length; i++) {
+        html += '<tr>';
+        for (let j = 0; j < tabelaSimplex[i].length; j++) {
+            html += `<td>${tabelaSimplex[i][j]}</td>`;
+        }
+        html += '</tr>';
+    }
+
+    html += '</tbody></table><br>';
+
+    return html;
+}
+

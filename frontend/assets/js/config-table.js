@@ -61,6 +61,7 @@ $(document).ready(() =>{
                     tabelaDinamica += '<option value="2">&lt;</option>';
                     tabelaDinamica += '<option value="3">&gt;=</option>';
                     tabelaDinamica += '<option value="4">&gt;</option>';
+                    tabelaDinamica += '<option value="5">=</option>';
                 tabelaDinamica += '</select>';
             tabelaDinamica +=  "</td>";
 
@@ -138,8 +139,8 @@ $(document).ready(() =>{
       dados.push({ "id": "limites", "value": limites });
   
       console.log('Array final:', dados);
-      
-      console.log('Teste:\n', convertJSONtoTempArray(dados));
+      // console.log('\n' + converterParaArrayFormatado(dados));
+      chamarConversor(dados);
   
     });
 
@@ -164,63 +165,46 @@ $(document).ready(() =>{
       clickedElement.css('font-size', '15px');
     });
   });
+  
 
-  function convertJSONtoTempArray(jsonData) {
-    // Initialize the temporary array
-    const tempArray = [];
-  
-    // Iterate through each object in the JSON data
-    for (const obj of jsonData) {
-      // Extract the ID and value properties
-      const id = obj.id;
-      const value = obj.value;
-  
-      // Handle different ID cases
-      switch (id) {
-        // Case for initial data
-        case 'dados-iniciais':
-          // Extract variable names
-          const varNames = value.map(item => item.value);
-  
-          // Add variable names to the temporary array
-          tempArray.push(varNames);
-          break;
-  
-        // Case for restriction objects
-        case `r${restrictionNumber}`:
-          // Extract constraint coefficients and RHS value
-          const coefficients = value.slice(0, -3).map(item => item.value);
-          const rhsValue = value[value.length - 1].value;
-  
-          // Convert coefficients and RHS to a string representation
-          const constraintString = `${coefficients.join('x') + varNames.join('')} <= ${rhsValue}`;
-  
-          // Add the constraint string to the temporary array
-          tempArray.push(constraintString);
-          break;
-  
-        // Case for limit objects
-        case 'limites':
-          // Extract upper and lower limits
-          const upperLimits = value.slice(0, 2).map(item => item.value);
-          const lowerLimits = value.slice(2).map(item => item.value);
-  
-          // Convert limits to a string representation
-          const limitStrings = [];
-          for (let i = 0; i < varNames.length; i++) {
-            limitStrings.push(`${varNames[i]} <= ${upperLimits[i]}`);
-            limitStrings.push(`${varNames[i]} >= ${lowerLimits[i]}`);
-          }
-  
-          // Add the limit strings to the temporary array
-          tempArray.push(...limitStrings);
-          break;
-  
-        default:
-          console.warn('Unrecognized ID:', id);
-      }
+//----------------------------------------------------------TEMPORÁRIO-----------------------------------------------------------
+// Função para converter os dados formatados
+// Função para converter os dados formatados
+function converterParaArrayFormatado(dados) {
+    // Encontrar os dados iniciais para Z
+    var dadosIniciais = dados.find(item => item.id === "dados-iniciais").value;
+    var Z = [];
+    Z.push(parseFloat(dadosIniciais.find(item => item.id === "Z-x1")?.value || 0));
+    Z.push(parseFloat(dadosIniciais.find(item => item.id === "Z-x2")?.value || 0));
+    Z.push(0); // Adiciona o zero no final de Z conforme especificado
+
+    // Extrair as restrições
+    var restricoes = [];
+    for (var i = 1; i <= dados.length - 2; i++) { // Iterar sobre as restrições, excluindo "dados-iniciais" e "limites"
+        var restricao = dados.find(item => item.id === "r" + i);
+        if (restricao) {
+            var linhaRestricao = [];
+            linhaRestricao.push(parseFloat(restricao.value.find(item => item.id === "r" + i + "x1")?.value || 0));
+            linhaRestricao.push(parseFloat(restricao.value.find(item => item.id === "r" + i + "x2")?.value || 0));
+
+            var RSH = parseFloat(restricao.value.find(item => item.id === "RSH" + i)?.value || 0);
+            if (isNaN(RSH)) {
+                console.warn(`RSH não encontrado ou inválido para RSH${i}`);
+                RSH = 0; // Definir como 0 se RSH não for um número válido
+            }
+            linhaRestricao.push(RSH);
+
+            restricoes.push(linhaRestricao);
+        } else {
+            console.warn(`Restrição não encontrada para r${i}`);
+        }
     }
-  
-    // Return the temporary array
-    return tempArray;
-  }
+
+    // Retornar o array formatado com Z seguido das restrições
+    return [Z].concat(restricoes);
+}
+
+function chamarConversor(dados){
+  localStorage.setItem('dados', JSON.stringify(converterParaArrayFormatado(dados)));
+  window.location.href = 'D:/Xampp/htdocs/projetoXis/projeto-xis/frontend/resolution.html'; // Redirecionamento para B.html
+}
