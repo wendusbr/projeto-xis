@@ -91,20 +91,16 @@ $(document).ready(() =>{
     atualizarDisponibilidadeMetodoGrafico();
 
     $("#gerarSolucao").on('click', function () {
-        // Captura o número de variáveis e restrições
         var numVariaveis = parseInt($('#numVariavel').val());
         var numRestricoes = parseInt($('#numRestricao').val());
 
-        // Captura o tipo de problema (max ou min)
         var tipoProblema = $("#min-max").val() === "2" ? "min" : "max";
 
-        // Array para armazenar os coeficientes da função objetivo Z
         var z = [];
         for (var i = 1; i <= numVariaveis; i++) {
             z.push(parseFloat($("#Z-x" + i).val()));
         }
 
-        // Array para armazenar as restrições
         var restricoes = [];
         for (var i = 1; i <= numRestricoes; i++) {
             var restricao = [];
@@ -140,7 +136,7 @@ $(document).ready(() =>{
         const activeElements = $('.menu li a.active');
         if (activeElements.length === 0) {
             alert('Nenhum método selecionado.\nPor favor, selecione um método para gerar a solução.');
-            return; // Prevent further execution if no active elements are found
+            return;
         }
 
         if (activeElements.attr('id') == "a2" && !($('#lin2').hasClass('disabled'))) {
