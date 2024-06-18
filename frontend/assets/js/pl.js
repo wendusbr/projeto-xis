@@ -43,10 +43,12 @@ function simplexMaxTable(entrada){
     return tabelaSimplex;
 }
 
-function simplexMax(entrada, numVariaveis, numRestricoes){
+function simplexMax(entrada){
     // var entrada = [[50, 80, 0], [1, 2, 120], [1, 1, 90]];
     // var entrada2 = [[8, 25, 0],[2,5,120], [0,3,60],[4,5,200]];
-    // var entrada3 = [[3,5,0],[1,0,4],[0,2,12],[3,2,18]] ;
+    // var entrada3 = [[3,5,0],[1,0,4],[0,2,12],[3,2,18]];
+    const numVariaveis = entrada[0].length-1;
+    const numRestricoes = entrada.length-1;
 
     let tabelaSimplex = simplexMaxTable(entrada);
     
@@ -60,7 +62,7 @@ function simplexMax(entrada, numVariaveis, numRestricoes){
             }
         }
 
-        if(pesoZ == 0)
+        if(pesoZ === 0)
             return;
 
         // Descobrir linha pivotal
@@ -74,6 +76,9 @@ function simplexMax(entrada, numVariaveis, numRestricoes){
                 }
             }
         }
+
+        if(!pesoRestricao)
+            return;
 
         let elementoPivotal = tabelaSimplex[linhaPivotal][colunaPivotal];
 
@@ -111,14 +116,14 @@ function simplexMinTable(entrada){
     let M = 100;
 
     // Montagem da linha Z
-    let Z = [];
-    for(let i=0; i<colunas; i++){
+    let z = [];
+    for(let i=0; i<colunas-1; i++){
         if(i < entrada[0].length-1)
-            Z[i] = entrada[0][i];
+            z.push(entrada[0][i]);
         else{
-            Z[i] = 0; // variável auxiliar
+            z.push(0); // variável auxiliar
             i++;
-            Z[i] = M; // variável artificial
+            z.push(M); // variável artificial
         }
     }
 
@@ -147,21 +152,115 @@ function simplexMinTable(entrada){
     }
 
     // Vetor de coeficentes das variáveis na base
-    let coefientes = [];
+    let c = [];
     for(let i=0; i<numRestricoes; i++)
-        coefientes[i] = M;
+        c.push(M);
 
-    let result = [Z, tabelaSimplex, coefientes];
+    // Vetor Zj
+    let zj = [];
+    for(let i=0; i<tabelaSimplex[0].length; i++){
+        let value = 0;
+        let j = 0;
+
+        tabelaSimplex.forEach(element => {
+            value += element[i]*c[j];
+            j++;
+            if(j == c.length)
+                j=0;
+        });
+
+        zj.push(value);
+    }
+
+    // Vetor pesoZj (Cj - Zj)
+    let pesoZj = [];
+    for(let i=0; i<z.length; i++)
+        pesoZj.push(z[i]-zj[i]);
+    
+    let result = [z, tabelaSimplex, c, zj, pesoZj];
 
     return result;
 }
 
 function simplexMin(entrada){
+    const numVariaveis = entrada[0].length-1;
+    const numRestricoes = entrada.length-1;
+
     let result = simplexMinTable(entrada);
 
-    let Z = result[0];
+    let z = result[0];
     let tabelaSimplex = result[1];
-    let coeficentes = result[2];
+    let c = result[2];
+    let zj = result[3];
+    let pesoZj = result[4]
 
-    console.log(Z, tabelaSimplex, coeficentes);
+
+    while(1){    
+        let minPesoZj=0, colunaPivotal;
+
+        for(let i=0; i<numVariaveis; i++){
+            if(!minPesoZj || pesoZj[i] < minPesoZj){
+                minPesoZj = pesoZj[i]
+                colunaPivotal = i;
+            }
+        }
+        if(minPesoZj === 0)
+            return;
+        
+        let pesoRestricao, linhaPivotal;
+
+        for(let i=0; i<tabelaSimplex.length; i++){
+            let element = tabelaSimplex[i];
+
+            if(element[colunaPivotal] > 0 && element[element.length-1] > 0){
+                if(!pesoRestricao || element[element.length-1]/element[colunaPivotal] < pesoRestricao){
+                    pesoRestricao = element[element.length-1]/element[colunaPivotal];
+                    linhaPivotal = i;
+                }
+            }
+        }
+
+        if(!pesoRestricao)
+            return;
+
+        let elementoPivotal = tabelaSimplex[linhaPivotal][colunaPivotal];
+
+        // Divide toda linha pivotal pelo elemento pivotal
+        if(elementoPivotal != 1){
+            for(let i=0; i<tabelaSimplex[0].length; i++)
+                tabelaSimplex[linhaPivotal][i] /= elementoPivotal;
+        }
+
+        // Escalonamento
+        let coeficiente;
+        for(let i=0; i<tabelaSimplex.length; i++){
+            if(i != linhaPivotal){
+                coeficiente = tabelaSimplex[i][colunaPivotal];
+                for(let j=0; j<tabelaSimplex[0].length; j++){
+                    tabelaSimplex[i][j] += -coeficiente*tabelaSimplex[linhaPivotal][j];
+                }
+            }
+        }
+
+        c[linhaPivotal] = z[colunaPivotal]; 
+
+        for(let i=0; i<tabelaSimplex[0].length; i++){
+            let value = 0;
+            let j = 0;
+
+            tabelaSimplex.forEach(element => {
+                value += element[i]*c[j];
+                j++;
+                if(j == c.length)
+                    j=0;
+            });
+
+            zj[i] = value;
+        }
+
+        for(let i=0; i<z.length; i++)
+            pesoZj[i] = (z[i]-zj[i]);
+
+        console.log(z, tabelaSimplex, c, zj, pesoZj);
+    }
 }
