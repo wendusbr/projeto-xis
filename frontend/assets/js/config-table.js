@@ -13,18 +13,6 @@ $(document).ready(() =>{
 
         tabelaDinamica += "<th scope='col'>&lt;&gt;=</th><th scope='col'>RSH</th></tr></thead><tbody id='conteudoTabela'>";
 
-        //-------------Nomeação de variáveis-------------//
-
-            tabelaDinamica += "<tr id='nomeDasVariaveis'><td scope='col'>Nome variável</td>";
-            
-                for (var i = 1; i <= $('#numVariavel').val() ; i++) {
-                    tabelaDinamica += "<td scope='col'>";
-                        tabelaDinamica += '<input style="border: none;" type="text" class="form-control" data-id="x' + i + '" id="nome-x'+ i +'" aria-describedby="basic-addon3 basic-addon4" maxlength="8"></input>';
-                    tabelaDinamica +="</td>";
-                }
-
-            tabelaDinamica += "<td scope='col'></td><td scope='col'></td></tr>";
-
         //-------------Tipo de problema (max-min)-------------//
 
         tabelaDinamica += "<tr id='tipoDeProblema'><td scope='col'>";
@@ -98,6 +86,10 @@ $(document).ready(() =>{
         $('#inputTabela').html(tabelaDinamica);
     });
 
+    // Chamada inicial
+    handleMenuClick();
+    atualizarDisponibilidadeMetodoGrafico();
+
     $("#gerarSolucao").on('click', function () {
       const activeElements = $('.menu li a.active');
       if (activeElements.length === 0) {
@@ -110,8 +102,6 @@ $(document).ready(() =>{
   
       // ------------- Dados Iniciais -------------
       var dadosIniciais = [
-        { "id": "nome-x1", "value": $("#nome-x1").val() },
-        { "id": "nome-x2", "value": $("#nome-x2").val() },
         { "id": "min-max", "value": $("#min-max").val() },
         { "id": "Z-x1", "value": $("#Z-x1").val() },
         { "id": "Z-x2", "value": $("#Z-x2").val() }
@@ -138,31 +128,37 @@ $(document).ready(() =>{
       ];
       dados.push({ "id": "limites", "value": limites });
   
-      console.log('Array final:', dados);
-      // console.log('\n' + converterParaArrayFormatado(dados));
-      chamarConversor(dados);
-  
+      if(activeElements.attr('id') == "a2" && !($('#lin2').hasClass('disabled'))) {
+        EnviarParaMetodoGrafico(dados);
+      } else if(activeElements.attr('id') == "a4"){
+        chamarConversor(dados);
+      } else if(activeElements.attr('id') == "a1"){
+        console.log('Array final:', dados);
+      } else{
+        alert('Método selecionado inválido!\nTente novamente');
+      }
     });
 
     $('.menu li a').click(function(event) {
-      event.preventDefault(); 
-  
-      const clickedElementId = $(this).attr('id');
-      const activeViewClass = 'active';
-  
-      $('.menu li a').removeClass(activeViewClass);
-      $('.menu li').removeAttr('style'); 
-  
-      $(this).addClass(activeViewClass);
-  
-      const clickedElementIdWithoutHash = clickedElementId.slice(1); 
-      const clickedElement = $('#lin' + clickedElementIdWithoutHash);
-  
-      clickedElement.css('background-color', '#920686');
-      clickedElement.css('color', 'black');
-      clickedElement.css('text-shadow', '0px 0px 5px #fff');
-      clickedElement.css('font-weight', 'bold');
-      clickedElement.css('font-size', '15px');
+        handleMenuClick();
+    });
+
+    // Adicionar evento para atualização quando o número de variáveis é alterado
+    $('#numVariavel').on('input', function() {
+        handleMenuClick();
+    });
+
+    // Evento para atualizar sempre que o número de variáveis mudar
+    $('#numVariavel').on('input', function() {
+        atualizarDisponibilidadeMetodoGrafico();
+    });
+
+    // Evento de clique no método gráfico
+    $('#a2').click(function(event) {
+        if ($(this).parent().hasClass('disabled')) {
+            event.preventDefault();
+            alert('A opção Gráfico não está disponível quando há mais de 2 variáveis.');
+        }
     });
   });
   
@@ -206,5 +202,88 @@ function converterParaArrayFormatado(dados) {
 
 function chamarConversor(dados){
   localStorage.setItem('dados', JSON.stringify(converterParaArrayFormatado(dados)));
-  window.location.href = 'D:/Xampp/htdocs/projetoXis/projeto-xis/frontend/resolution.html'; // Redirecionamento para B.html
+  window.location.href = 'D:/Xampp/htdocs/projetoXis/projeto-xis/frontend/resolution.html';
+}
+
+
+function EnviarParaMetodoGrafico(dados){
+    localStorage.setItem('dados', JSON.stringify(dados));
+    window.location.href = 'D:/Xampp/htdocs/projetoXis/projeto-xis/frontend/graphical.html';
+}
+//----------------------------------------------------------STYLE-----------------------------------------------------------
+
+// Função para manipular cliques nos itens do menu
+function handleMenuClick() {
+    const activeViewClass = 'active';
+    const disabledClass = 'disabled';
+
+    $('.menu li a').click(function(event) {
+        event.preventDefault();
+
+        const clickedElementId = $(this).attr('id');
+        // Verificar se o elemento clicado é "Gráfico" e se o número de variáveis é 3
+        if (clickedElementId === 'a2' && $('#numVariavel').val() == 3) {
+            // Desativar a opção "Gráfico" visualmente e logicamente
+            $(this).parent().addClass(disabledClass);
+            $("#a2").removeClass(activeViewClass);
+            $('#a2').removeAttr('style');
+            $(this).css({
+                'background-color': '#f2f2f2',
+                'color': '#bbb',
+                'text-shadow': 'none',
+                'font-weight': 'normal',
+                'font-size': '15px'
+            });
+
+            // Remover classe ativa de todos os elementos do menu
+            $('.menu li a').removeClass(activeViewClass);
+
+            return; // Sair da função após desativar "Gráfico"
+        }
+
+        // Remover classes ativas de todos os elementos do menu
+        $('.menu li a').removeClass(activeViewClass);
+        $('.menu li').removeAttr('style');
+
+        // Verificar se o elemento está desabilitado
+        if (!$(this).parent().hasClass(disabledClass)) {
+            $(this).addClass(activeViewClass);
+
+            // Estilizar o elemento clicado
+            const clickedElementIdWithoutHash = clickedElementId.slice(1);
+            const clickedElement = $('#lin' + clickedElementIdWithoutHash);
+            clickedElement.css({
+                'background-color': '#920686',
+                'color': 'black',
+                'text-shadow': '0px 0px 5px #fff',
+                'font-weight': 'bold',
+                'font-size': '15px'
+            });
+        } else {
+            // Adicionar classe disabled e estilos específicos ao elemento pai (li)
+            $(this).parent().addClass(disabledClass);
+
+            // Remover classe active do elemento clicado
+            $(this).removeClass(activeViewClass);
+
+            // Estilizar o elemento clicado quando desabilitado
+            $(this).css({
+                'background-color': '#f2f2f2',
+                'color': '#bbb',
+                'text-shadow': 'none',
+                'font-weight': 'normal',
+                'font-size': '15px'
+            });
+        }
+    });
+}
+
+// Função para atualizar a disponibilidade do método gráfico
+function atualizarDisponibilidadeMetodoGrafico() {
+    var numVariaveis = parseInt($('#numVariavel').val());
+    if (numVariaveis > 2) {
+        $('#a2').parent().addClass('disabled');
+    } else {
+        $('#a2').parent().removeClass('disabled');
+    }
 }
