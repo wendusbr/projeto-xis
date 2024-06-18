@@ -44,15 +44,20 @@ function simplexMaxTable(entrada){
 }
 
 function simplexMax(entrada){
-    // var entrada = [[50, 80, 0], [1, 2, 120], [1, 1, 90]];
-    // var entrada2 = [[8, 25, 0],[2,5,120], [0,3,60],[4,5,200]];
-    // var entrada3 = [[3,5,0],[1,0,4],[0,2,12],[3,2,18]];
     const numVariaveis = entrada[0].length-1;
     const numRestricoes = entrada.length-1;
 
     let tabelaSimplex = simplexMaxTable(entrada);
     
+    let result = [];
+    let it = 0;
     while(1){
+        console.log(tabelaSimplex);
+        let html = gerarTabelaIteracao(it, tabelaSimplex);
+        it++;
+
+        document.body.innerHTML += html;
+
         // Descobrir coluna pivotal
         let pesoZ=0, colunaPivotal;
         for(let i=1; i<=numVariaveis; i++){
@@ -63,7 +68,7 @@ function simplexMax(entrada){
         }
 
         if(pesoZ === 0)
-            return;
+            break;
 
         // Descobrir linha pivotal
         let pesoRestricao, linhaPivotal;
@@ -78,7 +83,7 @@ function simplexMax(entrada){
         }
 
         if(!pesoRestricao)
-            return;
+            break;
 
         let elementoPivotal = tabelaSimplex[linhaPivotal][colunaPivotal];
 
@@ -98,15 +103,10 @@ function simplexMax(entrada){
                 }
             }
         }
-
-        console.log(tabelaSimplex);
     }
 }
 
-// var entrada = [[3,8,0], [1,4,3.5], [1,2,2.5]]
-// [3 8 0]
-// [1 4 3.5]
-// [1 2 2.5]
+
 function simplexMinTable(entrada){
     const numVariaveis = entrada[0].length-1;
     const numRestricoes = entrada.length-1;
@@ -172,7 +172,7 @@ function simplexMinTable(entrada){
         zj.push(value);
     }
 
-    // Vetor pesoZj (Cj - Zj)
+    // Vetor pesoZj
     let pesoZj = [];
     for(let i=0; i<z.length; i++)
         pesoZj.push(z[i]-zj[i]);
@@ -183,23 +183,34 @@ function simplexMinTable(entrada){
 }
 
 function simplexMin(entrada){
-    const numVariaveis = entrada[0].length-1;
-    const numRestricoes = entrada.length-1;
+    // const numVariaveis = entrada[0].length-1;
+    // const numRestricoes = entrada.length-1;
 
-    let result = simplexMinTable(entrada);
+    //let result = simplexMinTable(entrada);
 
-    let z = result[0];
-    let tabelaSimplex = result[1];
-    let c = result[2];
-    let zj = result[3];
-    let pesoZj = result[4]
+    // let z = result[0];
+    // let tabelaSimplex = result[1];
+    // let c = result[2];
+    // let zj = result[3];
+    // let pesoZj = result[4];
 
+    let M = 1000;
 
-    while(1){    
+    let z = [0.4,0.5,0,0,100,100];
+    let tabelaSimplex = [[0.3, 0.1, 1, 0, 0, 0, 2.7],[0.5, 0.5, 0, 0, 0, 1, 6],[0.6, 0.4, 0, -1, 1, 0, 6]];
+    let c = [0, M, M];
+    let zj = [1.1*M, 0.9*M, 0, -M, M, M, 12*M];
+    let pesoZj = [0.4-zj[0], 0.5-zj[1], 0, -M, 0, 0];
+
+    //console.log(z, tabelaSimplex, c, zj, pesoZj);
+
+    while(1){
+        console.log(z, tabelaSimplex, c, zj, pesoZj);
+        
+        // Descobrir coluna pivotal
         let minPesoZj=0, colunaPivotal;
-
-        for(let i=0; i<numVariaveis; i++){
-            if(!minPesoZj || pesoZj[i] < minPesoZj){
+        for(let i=0; i<4; i++){
+            if(pesoZj[i] < minPesoZj){
                 minPesoZj = pesoZj[i]
                 colunaPivotal = i;
             }
@@ -207,14 +218,12 @@ function simplexMin(entrada){
         if(minPesoZj === 0)
             return;
         
+        // Descobrir linha pivotal
         let pesoRestricao, linhaPivotal;
-
         for(let i=0; i<tabelaSimplex.length; i++){
-            let element = tabelaSimplex[i];
-
-            if(element[colunaPivotal] > 0 && element[element.length-1] > 0){
-                if(!pesoRestricao || element[element.length-1]/element[colunaPivotal] < pesoRestricao){
-                    pesoRestricao = element[element.length-1]/element[colunaPivotal];
+            if(tabelaSimplex[i][colunaPivotal] > 0 && tabelaSimplex[i][tabelaSimplex[i].length-1] > 0){
+                if(!pesoRestricao || tabelaSimplex[i][tabelaSimplex[i].length-1]/tabelaSimplex[i][colunaPivotal] < pesoRestricao){
+                    pesoRestricao = tabelaSimplex[i][tabelaSimplex[i].length-1]/tabelaSimplex[i][colunaPivotal];
                     linhaPivotal = i;
                 }
             }
@@ -242,8 +251,10 @@ function simplexMin(entrada){
             }
         }
 
+        // Variável referente à coluna pivotal entra na base
         c[linhaPivotal] = z[colunaPivotal]; 
 
+        // Atualiza vetor Zj
         for(let i=0; i<tabelaSimplex[0].length; i++){
             let value = 0;
             let j = 0;
@@ -258,9 +269,42 @@ function simplexMin(entrada){
             zj[i] = value;
         }
 
+        // Atualiza vetor pesoZj
         for(let i=0; i<z.length; i++)
             pesoZj[i] = (z[i]-zj[i]);
-
-        console.log(z, tabelaSimplex, c, zj, pesoZj);
     }
+}
+
+function gerarTabelaIteracao(iteracao, tabelaSimplex) {
+    let html = `<h4>Iteração ${iteracao}</h4>`;
+    html += '<table class="table table-bordered">';
+    html += '<thead><tr>';
+
+    // Cabeçalho das variáveis não-básicas
+    html += '<th scope="col">Z</th>';
+    for (let i = 1; i < tabelaSimplex[0].length - 1; i++) {
+        if (i <= tabelaSimplex[0].length - 2 - (tabelaSimplex.length - 1)) {
+            html += `<th scope="col">x${i}</th>`;
+        } else {
+            html += `<th scope="col">s${i - (tabelaSimplex[0].length - 2 - (tabelaSimplex.length - 1))}</th>`;
+        }
+    }
+
+    // Cabeçalho da última coluna (RSH)
+    html += '<th scope="col">RSH</th>';
+    html += '</tr></thead>';
+    html += '<tbody>';
+
+    // Conteúdo das linhas
+    for (let i = 0; i < tabelaSimplex.length; i++) {
+        html += '<tr>';
+        for (let j = 0; j < tabelaSimplex[i].length; j++) {
+            html += `<td>${tabelaSimplex[i][j]}</td>`;
+        }
+        html += '</tr>';
+    }
+
+    html += '</tbody></table><br>';
+
+    return html;
 }
