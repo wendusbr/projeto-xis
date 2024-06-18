@@ -196,7 +196,7 @@ function simplexMin(entrada){
 
     let M = 1000;
 
-    let z = [0.4,0.5,0,0,100,100];
+    let z = [0.4,0.5,0,0,M,M];
     let tabelaSimplex = [[0.3, 0.1, 1, 0, 0, 0, 2.7],[0.5, 0.5, 0, 0, 0, 1, 6],[0.6, 0.4, 0, -1, 1, 0, 6]];
     let c = [0, M, M];
     let zj = [1.1*M, 0.9*M, 0, -M, M, M, 12*M];
