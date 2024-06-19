@@ -1,6 +1,7 @@
 $(document).ready(() =>{
     // localStorage.clear();
     $("#gerarTabela").on('click', function (){
+
         var tabelaDinamica = "<table id='modelagemTabelar' class='table table-bordered nowrap mb-4 mt-1'>";
 
         //-------------Cabeçalho-------------//
@@ -83,6 +84,10 @@ $(document).ready(() =>{
 
         tabelaDinamica += "</tbody></table>";
         $('#inputTabela').html(tabelaDinamica);
+
+        $('.menu li a').removeClass('active');
+        $('.menu li a').removeClass('disabled');
+        $('.menu li').removeAttr('style');
     });
 
     // Chamada inicial
@@ -167,7 +172,8 @@ $(document).ready(() =>{
             return;
         }
     
-        if (activeElements.attr('id') == "a2" && !($('#lin2').hasClass('disabled'))) {
+        debugger;
+        if ((activeElements.attr('id') == "a2") && (numVariaveis === 2) && !($('#lin2').hasClass('disabled'))) {
             EnviarParaMetodoGrafico(novoObjeto);
         } else if (activeElements.attr('id') == "a3") {
             EnviarParaMetodoTabular(novoObjeto);
@@ -181,15 +187,6 @@ $(document).ready(() =>{
 
     $('.menu li a').click(function(event) {
         handleMenuClick();
-    });
-
-    // Adicionar evento para atualização quando o número de variáveis é alterado
-    $('#numVariavel').on('input', function() {
-        handleMenuClick();
-    });
-
-    // Evento para atualizar sempre que o número de variáveis mudar
-    $('#numVariavel').on('input', function() {
         atualizarDisponibilidadeMetodoGrafico();
     });
 
