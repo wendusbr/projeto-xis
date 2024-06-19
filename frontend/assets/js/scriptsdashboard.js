@@ -1,3 +1,4 @@
+// config-table
 $(document).ready(() =>{
     // localStorage.clear();
     $("#gerarTabela").on('click', function (){
@@ -17,7 +18,7 @@ $(document).ready(() =>{
 
         tabelaDinamica += "<tr id='tipoDeProblema'><td scope='col'>";
             tabelaDinamica += '<select id="min-max" class="form-select text-center" aria-label="Small select example">';
-            tabelaDinamica += '<option selected>Tipo de problema</option>';
+            // tabelaDinamica += '<option selected>Tipo de problema</option>';
             tabelaDinamica += '<option value="1">Maximização</option>';
             tabelaDinamica += '<option value="2">Minimização</option>';
             tabelaDinamica += '</select>';
@@ -283,6 +284,10 @@ function handleMenuClick() {
     });
 }
 
+$('#btnVoltar').on('click', function(){
+    window.location = 'index.html';
+});
+
 // Função para atualizar a disponibilidade do método gráfico
 function atualizarDisponibilidadeMetodoGrafico() {
     var numVariaveis = parseInt($('#numVariavel').val());
@@ -293,3 +298,4 @@ function atualizarDisponibilidadeMetodoGrafico() {
         $('#a2').removeAttr('style');
     }
 }
+

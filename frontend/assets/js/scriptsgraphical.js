@@ -164,3 +164,6 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 });
 
+$('#btnVoltar').on('click', function(){
+    window.location = 'dashboard.html';
+});

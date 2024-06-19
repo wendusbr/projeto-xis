@@ -1,28 +1,96 @@
-/*
- var entrada = {
-        numVariaveis: 2, 
-        numRestricoes: 3, 
-        tipo: 'min', 
-        z:[0.4, 0.5], 
-        restricoes:[['<=', 0.3, 0.1, 2.7], ['=', 0.5, 0.5, 6], ['>=', 0.6, 0.4, 6]]
-    };
-*/
+function gerarTabelaHTML(arrayDados) {
+    // Número de variáveis X
+    var numVariaveis = arrayDados.numVariaveis;
 
-document.addEventListener("DOMContentLoaded", function() {
-    // Recuperando os dados do localStorage
-    const dadosString = localStorage.getItem('dados');
-    const dados = JSON.parse(dadosString);
-    // console.log(dados);
-    // localStorage.clear();
-    gerarTabelaHTML(dados);
-    simplexMethod(dados);
-});
+    // Construir a expressão de maximização ou minimização Z
+    var tipo = arrayDados.tipo.toUpperCase();
+    var Z = tipo === "MAX" ? "MAXIMIZAR: Z = " : "MINIMIZAR: Z = ";
+    for (var i = 0; i < numVariaveis; i++) {
+        Z += arrayDados.z[i] + " X<span class='subindice'>" + (i + 1) + "</span>";
+        if (i < numVariaveis - 1) {
+            Z += " + ";
+        }
+    }
 
+    // Construir as restrições
+    var restricoes = "<p>sujeito a</p>";
+    for (var i = 0; i < arrayDados.numRestricoes; i++) {
+        var restricao = "";
+        for (var j = 0; j < numVariaveis; j++) {
+            restricao += arrayDados.restricoes[i][j + 1] + " X<span class='subindice'>" + (j + 1) + "</span> ";
+            if (j < numVariaveis - 1) {
+                restricao += "+ ";
+            }
+        }
+        var rhs = arrayDados.restricoes[i][numVariaveis + 1];
+        var sinal; //= arrayDados.restricoes[i][0] === "<=" ? "≤" : "≥";
+        if(arrayDados.restricoes[i][0] === "<="){
+            sinal = "≤";
+        } else if(arrayDados.restricoes[i][0] === ">="){
+            sinal = "≥";
+        } else{
+            sinal = "=";
+        }
+        restricoes += "<p>" + restricao + sinal + " " + rhs + "</p>";
+    }
+
+    // Montar o HTML da tabela
+    var variaveisX = "";
+    for (var i = 1; i <= numVariaveis; i++) {
+        variaveisX += "X<span class='subindice'>" + i + "</span>";
+        if (i < numVariaveis) {
+            variaveisX += ", ";
+        }
+    }
+
+    var tabelaHTML = `<table style="width: 400px;" class="no-borde centro">
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <span class="title" id="title">${Z}</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>${restricoes}</td>
+                            </tr>
+                            <tr>
+                                <td>${variaveisX} ≥ 0</td>
+                            </tr>
+                        </tbody>
+                    </table>`;
+
+    // Retornar o HTML da tabela
+    document.getElementById('modelagem-feita').innerHTML = tabelaHTML + "<hr>";
+
+}
+// {
+//     numVariaveis: 2, 
+//     numRestricoes: 2, 
+//     tipo: 'max', 
+//     z:[50, 80], 
+//     restricoes:[['<=', 1, 2, 120], ['<=', 1, 1, 90]]
+// };
 var M = 1000;
-
 function simplexMethod(entrada){
+    if(entrada.tipo == 'max'){
+        let dados = [];
+        entrada.z.push(0);
 
-    if(entrada.tipo == 'min'){
+        dados.push(entrada.z);
+
+        for(let i=0; i<entrada.restricoes.length; i++){
+            dados.push([]);
+
+            for(let j=1; j<entrada.restricoes[0].length; j++)
+                dados[i+1].push(entrada.restricoes[i][j]);
+        }
+
+        console.log(dados);
+
+        simplexMax(dados);
+    }
+
+    else if(entrada.tipo == 'min'){
         let z = [];
         let c = [];
 
@@ -218,18 +286,21 @@ function simplexMin(entrada){
 }
 
 function writeIterationMin(it, z, c, tabelaSimplex, zj, pesoZj, linhaPivotal, colunaPivotal){
+    // Título e inicialização da tabela
     var table = `
         <h1>It ${it} <span class="subindice">(M = ${M})</span></h1>
         <div class="table-responsive">
         <table class="table mb-5 mt-1">
     `;
 
+    // Linha Z
     table += '<tr><td class="fw-bold">Z &rarr;</td>';
     z.forEach(element => {
         element == M ? table += `<td>M</td>` : table += `<td>${element}</td>`;
     });
     table += '<td class="fw-bold">LD &darr;</td></tr>';
 
+    // Linha variáveis
     table += '<tr class="fw-bold"><td>Variáveis &rarr;</td>';
     for(let i=0; i<z.length; i++){
         table += '<td>';
@@ -250,10 +321,12 @@ function writeIterationMin(it, z, c, tabelaSimplex, zj, pesoZj, linhaPivotal, co
     }
     table += '<td style="font-size: 12px;">X: variável padrão<br>S: variável auxiliar<br>A: variável artificial</td></tr>';
 
+    // C + Tabela simplex
     for(let i=0; i<tabelaSimplex.length; i++){
         table += '<tr>';
-        table += `<td>${c[i]}</td>`;
+        table += `<td>${c[i]}</td>`; // Coluna C
 
+        // Linha Tabela Simplex
         for(let j=0; j<tabelaSimplex[i].length; j++){
             i==linhaPivotal || j==colunaPivotal ? table += `<td class="table-info">${tabelaSimplex[i][j]}</td>` : table += `<td>${tabelaSimplex[i][j]}</td>`;
         }
@@ -261,130 +334,134 @@ function writeIterationMin(it, z, c, tabelaSimplex, zj, pesoZj, linhaPivotal, co
         table += '</tr>';
     }
 
+    // Linha Zj
     table += '<tr><td class="fw-bold">Zj &rarr;</td>'
     zj.forEach(element => {
         table += `<td>${element}</td>`
     });
     table += '</tr>';
 
+    // Linha pesoZj
     table += '<tr><td class="fw-bold">pesoZj &rarr;</td>'
     pesoZj.forEach(element => {
         table += `<td>${element}</td>`
     });
     table += '<td></td></tr>';
 
+    // Finaliza tabela
     table += '</table></div>';
-    // document.body.innerHTML += table; // Adapte como quiser
+
+    // Insere no HTML
     document.getElementById('modelagem-passos').innerHTML += table;
 }
 
-// function simplexMaxTable(entrada){
-//     const numVariaveis = entrada[0].length-1;
-//     const numRestricoes = entrada.length-1;
-//     let identidade = 1;
+function simplexMaxTable(entrada){
+    const numVariaveis = entrada[0].length-1;
+    const numRestricoes = entrada.length-1;
+    let identidade = 1;
     
-//     let tabelaSimplex = [];
-//     const linhas = entrada.length;
-//     const colunas = numVariaveis + numRestricoes + 2; // 2 => coluna Z e LD
+    let tabelaSimplex = [];
+    const linhas = entrada.length;
+    const colunas = numVariaveis + numRestricoes + 2; // 2 => coluna Z e LD
 
-//     for(let i=0; i<linhas; i++){
-//         tabelaSimplex.push([]); // Inicializa linha
+    for(let i=0; i<linhas; i++){
+        tabelaSimplex.push([]); // Inicializa linha
 
-//         for(let j=0; j<colunas; j++){
-//             // Se primeira coluna (Z)
-//              if(j==0){
-//                 tabelaSimplex[i][j] = i==0 ? 1 : 0;
-//              }
-//              // Se colunas de variáveis
-//              else if(j<entrada[0].length){
-//                 tabelaSimplex[i][j] = i==0 ? -entrada[i][j-1] : entrada[i][j-1];
-//              }
-//              // Se colunas de variáveis auxiliares
-//              else if(j<colunas-1){
-//                 if(i==0){
-//                     tabelaSimplex[i][j] = 0;
-//                 }
-//                 else{
-//                     if(i==identidade && j==numVariaveis+identidade){
-//                         tabelaSimplex[i][j] = 1;
-//                         identidade++;
-//                     }
-//                     else
-//                         tabelaSimplex[i][j] = 0;
-//                 }
-//              }
-//              // Se lado direto (LD)
-//              else{
-//                 tabelaSimplex[i][j] = entrada[i][entrada[0].length-1];
-//              }
-//         }
-//     }
+        for(let j=0; j<colunas; j++){
+            // Se primeira coluna (Z)
+             if(j==0){
+                tabelaSimplex[i][j] = i==0 ? 1 : 0;
+             }
+             // Se colunas de variáveis
+             else if(j<entrada[0].length){
+                tabelaSimplex[i][j] = i==0 ? -entrada[i][j-1] : entrada[i][j-1];
+             }
+             // Se colunas de variáveis auxiliares
+             else if(j<colunas-1){
+                if(i==0){
+                    tabelaSimplex[i][j] = 0;
+                }
+                else{
+                    if(i==identidade && j==numVariaveis+identidade){
+                        tabelaSimplex[i][j] = 1;
+                        identidade++;
+                    }
+                    else
+                        tabelaSimplex[i][j] = 0;
+                }
+             }
+             // Se lado direto (LD)
+             else{
+                tabelaSimplex[i][j] = entrada[i][entrada[0].length-1];
+             }
+        }
+    }
 
-//     return tabelaSimplex;
-// }
+    return tabelaSimplex;
+}
 
-// function simplexMax(entrada){
-//     const numVariaveis = entrada[0].length-1;
-//     const numRestricoes = entrada.length-1;
+function simplexMax(entrada){
+    const numVariaveis = entrada[0].length-1;
+    const numRestricoes = entrada.length-1;
 
-//     let tabelaSimplex = simplexMaxTable(entrada);
+    let tabelaSimplex = simplexMaxTable(entrada);
     
-//     let result = [];
-//     let it = 0;
-//     while(1){
-//         console.log(tabelaSimplex);
-//         let html = gerarTabelaIteracao(it, tabelaSimplex);
-//         it++;
+    let result = [];
+    let it = 0;
+    while(1){
+        console.log(tabelaSimplex);
+        let html = gerarTabelaIteracao(it, tabelaSimplex);
+        it++;
 
-//         document.body.innerHTML += html;
+        document.body.innerHTML += html;
 
-//         // Descobrir coluna pivotal
-//         let pesoZ=0, colunaPivotal;
-//         for(let i=1; i<=numVariaveis; i++){
-//             if(tabelaSimplex[0][i] < pesoZ){
-//                 pesoZ = tabelaSimplex[0][i];
-//                 colunaPivotal = i;
-//             }
-//         }
+        // Descobrir coluna pivotal
+        let pesoZ=0, colunaPivotal;
+        for(let i=1; i<=numVariaveis; i++){
+            if(tabelaSimplex[0][i] < pesoZ){
+                pesoZ = tabelaSimplex[0][i];
+                colunaPivotal = i;
+            }
+        }
 
-//         if(pesoZ === 0)
-//             break;
+        if(pesoZ === 0)
+            break;
 
-//         // Descobrir linha pivotal
-//         let pesoRestricao, linhaPivotal;
-//         for(let i=1; i<=numRestricoes; i++){
-//             // Não se divide entre números negativos
-//             if(tabelaSimplex[i][tabelaSimplex[0].length-1] > 0 && tabelaSimplex[i][colunaPivotal] > 0){
-//                 if(!pesoRestricao || tabelaSimplex[i][tabelaSimplex[0].length-1]/tabelaSimplex[i][colunaPivotal] < pesoRestricao){
-//                     pesoRestricao = tabelaSimplex[i][tabelaSimplex[0].length-1]/tabelaSimplex[i][colunaPivotal];
-//                     linhaPivotal = i;
-//                 }
-//             }
-//         }
+        // Descobrir linha pivotal
+        let pesoRestricao, linhaPivotal;
+        for(let i=1; i<=numRestricoes; i++){
+            // Não se divide entre números negativos
+            if(tabelaSimplex[i][tabelaSimplex[0].length-1] > 0 && tabelaSimplex[i][colunaPivotal] > 0){
+                if(!pesoRestricao || tabelaSimplex[i][tabelaSimplex[0].length-1]/tabelaSimplex[i][colunaPivotal] < pesoRestricao){
+                    pesoRestricao = tabelaSimplex[i][tabelaSimplex[0].length-1]/tabelaSimplex[i][colunaPivotal];
+                    linhaPivotal = i;
+                }
+            }
+        }
 
-//         if(!pesoRestricao)
-//             break;
+        if(!pesoRestricao)
+            break;
 
-//         let elementoPivotal = tabelaSimplex[linhaPivotal][colunaPivotal];
+        let elementoPivotal = tabelaSimplex[linhaPivotal][colunaPivotal];
 
-//         // Divide toda linha pivotal pelo elemento pivotal
-//         if(elementoPivotal != 1){
-//             for(let i=0; i<tabelaSimplex[0].length; i++)
-//                 tabelaSimplex[linhaPivotal][i] /= elementoPivotal;
-//         }
+        // Divide toda linha pivotal pelo elemento pivotal
+        if(elementoPivotal != 1){
+            for(let i=0; i<tabelaSimplex[0].length; i++)
+                tabelaSimplex[linhaPivotal][i] /= elementoPivotal;
+        }
 
-//         // Escalonamento
-//         let coeficiente;
-//         for(let i=0; i<tabelaSimplex.length; i++){
-//             if(i != linhaPivotal){
-//                 coeficiente = tabelaSimplex[i][colunaPivotal];
-//                 for(let j=0; j<tabelaSimplex[0].length; j++){
-//                     tabelaSimplex[i][j] += -coeficiente*tabelaSimplex[linhaPivotal][j];
-//                 }
-//             }
-//         }
-//     }
-// }
+        // Escalonamento
+        let coeficiente;
+        for(let i=0; i<tabelaSimplex.length; i++){
+            if(i != linhaPivotal){
+                coeficiente = tabelaSimplex[i][colunaPivotal];
+                for(let j=0; j<tabelaSimplex[0].length; j++){
+                    tabelaSimplex[i][j] += -coeficiente*tabelaSimplex[linhaPivotal][j];
+                }
+            }
+        }
+    }
+}
 
 // function simplexMinTable(entrada){
 //     const numVariaveis = entrada[0].length-1;
@@ -461,36 +538,36 @@ function writeIterationMin(it, z, c, tabelaSimplex, zj, pesoZj, linhaPivotal, co
 //     return result;
 // }
 
-// function gerarTabelaIteracao(iteracao, tabelaSimplex) {
-//     let html = `<h4>Iteração ${iteracao}</h4>`;
-//     html += '<table class="table table-bordered">';
-//     html += '<thead><tr>';
+function gerarTabelaIteracao(iteracao, tabelaSimplex) {
+    let html = `<h4>Iteração ${iteracao}</h4>`;
+    html += '<table class="table table-bordered">';
+    html += '<thead><tr>';
 
-//     // Cabeçalho das variáveis não-básicas
-//     html += '<th scope="col">Z</th>';
-//     for (let i = 1; i < tabelaSimplex[0].length - 1; i++) {
-//         if (i <= tabelaSimplex[0].length - 2 - (tabelaSimplex.length - 1)) {
-//             html += `<th scope="col">x${i}</th>`;
-//         } else {
-//             html += `<th scope="col">s${i - (tabelaSimplex[0].length - 2 - (tabelaSimplex.length - 1))}</th>`;
-//         }
-//     }
+    // Cabeçalho das variáveis não-básicas
+    html += '<th scope="col">Z</th>';
+    for (let i = 1; i < tabelaSimplex[0].length - 1; i++) {
+        if (i <= tabelaSimplex[0].length - 2 - (tabelaSimplex.length - 1)) {
+            html += `<th scope="col">x${i}</th>`;
+        } else {
+            html += `<th scope="col">s${i - (tabelaSimplex[0].length - 2 - (tabelaSimplex.length - 1))}</th>`;
+        }
+    }
 
-//     // Cabeçalho da última coluna (RSH)
-//     html += '<th scope="col">RSH</th>';
-//     html += '</tr></thead>';
-//     html += '<tbody>';
+    // Cabeçalho da última coluna (RSH)
+    html += '<th scope="col">RSH</th>';
+    html += '</tr></thead>';
+    html += '<tbody>';
 
-//     // Conteúdo das linhas
-//     for (let i = 0; i < tabelaSimplex.length; i++) {
-//         html += '<tr>';
-//         for (let j = 0; j < tabelaSimplex[i].length; j++) {
-//             html += `<td>${tabelaSimplex[i][j]}</td>`;
-//         }
-//         html += '</tr>';
-//     }
+    // Conteúdo das linhas
+    for (let i = 0; i < tabelaSimplex.length; i++) {
+        html += '<tr>';
+        for (let j = 0; j < tabelaSimplex[i].length; j++) {
+            html += `<td>${tabelaSimplex[i][j]}</td>`;
+        }
+        html += '</tr>';
+    }
 
-//     html += '</tbody></table><br>';
+    html += '</tbody></table><br>';
 
-//     return html;
-// }
+    return html;
+}
