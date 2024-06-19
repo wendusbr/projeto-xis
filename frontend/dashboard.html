@@ -4,17 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - XIS</title>
-
     <link rel="stylesheet" href="assets/bootstrap-5.3.3-dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="assets/css/dashboard.css">
 </head>
 <body class="bg-body-secondary">
-    <header class="bg-white px-3">
+    <header class="fixed-top bg-white px-3 mb-5">
         <a href="index.html">
             <img src="assets/img/logo.png" alt="" width="150px">
         </a>
     </header>
-    <section class="container-fluid">
+    <section class="mt-5 container-fluid">
         <div id="metodo-gerador" class="row p-3">
             <Select id="metodo" class="form-select">
                 <option value="" selected>Programação Linear</option>
@@ -34,7 +33,7 @@
         </div>
         <h6 class="text-danger text-center">*ATENÇÃO: Independente da seleção do tipo de restrição, em MAXIMIZAÇÃO todas serão consideradas &lt;=</h6>
         <div class="text-center row justify-content-center">
-            <div id="inputTabela" class="col-6 col-sm-8 col-md-9 vertical">
+            <div id="inputTabela" class="col-11 col-sm-8 col-md-8 col-lg-8 vertical">
                 <!-- Tabela dinâmicamente gerada -->
             </div>
         </div>
@@ -66,5 +65,4 @@
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 <script src="assets/bootstrap-5.3.3-dist/js/bootstrap.bundle.min.js"></script>
 <script src="assets/js/scriptsdashboard.js"></script>
-<!-- <script src="assets/js/pl.js"></script> -->
 </html>
