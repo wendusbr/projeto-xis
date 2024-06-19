@@ -88,6 +88,9 @@ $(document).ready(() =>{
         $('.menu li a').removeClass('active');
         $('.menu li a').removeClass('disabled');
         $('.menu li').removeAttr('style');
+        
+        handleMenuClick();
+        atualizarDisponibilidadeMetodoGrafico();
     });
 
     // Chamada inicial
@@ -184,7 +187,6 @@ $(document).ready(() =>{
         }
     });
     
-
     $('.menu li a').click(function(event) {
         handleMenuClick();
         atualizarDisponibilidadeMetodoGrafico();
@@ -288,5 +290,6 @@ function atualizarDisponibilidadeMetodoGrafico() {
         $('#a2').parent().addClass('disabled');
     } else {
         $('#a2').parent().removeClass('disabled');
+        $('#a2').removeAttr('style');
     }
 }
