@@ -1,8 +1,6 @@
-// inputTabela
 $(document).ready(() =>{
     $("#gerarTabela").on('click', function (){
         var tabelaDinamica = "<table id='modelagemTabelar' class='table table-bordered nowrap mb-4 mt-1'>";
-        // tabelaDinamica += "<!--<caption>Lista de motoristas associados aos seus caminhões</caption>-->";
 
         //-------------Cabeçalho-------------//
         tabelaDinamica += "<thead><tr><th scope='col'>&nbsp;</th>";
@@ -93,21 +91,37 @@ $(document).ready(() =>{
     $("#gerarSolucao").on('click', function () {
         var numVariaveis = parseInt($('#numVariavel').val());
         var numRestricoes = parseInt($('#numRestricao').val());
-
+    
         var tipoProblema = $("#min-max").val() === "2" ? "min" : "max";
-
+    
+        // Verificar se todos os campos de Z estão preenchidos
         var z = [];
+        var zPreenchido = true;
         for (var i = 1; i <= numVariaveis; i++) {
-            z.push(parseFloat($("#Z-x" + i).val()));
+            var valorZ = parseFloat($("#Z-x" + i).val());
+            if (isNaN(valorZ)) {
+                zPreenchido = false;
+                break;
+            }
+            z.push(valorZ);
         }
-
+    
+        // Verificar se todos os campos de restrição estão preenchidos
+        var restricoesPreenchidas = true;
         var restricoes = [];
         for (var i = 1; i <= numRestricoes; i++) {
             var restricao = [];
             for (var j = 1; j <= numVariaveis; j++) {
-                restricao.push(parseFloat($("#r" + i + "x" + j).val()));
+                var valorRestricao = parseFloat($("#r" + i + "x" + j).val());
+                if (isNaN(valorRestricao)) {
+                    restricoesPreenchidas = false;
+                    break;
+                }
+                restricao.push(valorRestricao);
             }
             var tipoRestricao = $("#r" + i).val();
+            if (!restricoesPreenchidas) break; // Se já não estiver preenchido, sair do loop
+    
             if (tipoRestricao === "1") {
                 restricao.unshift("<=");
             } else if (tipoRestricao === "2") {
@@ -119,10 +133,23 @@ $(document).ready(() =>{
             } else if (tipoRestricao === "5") {
                 restricao.unshift("=");
             }
-            restricao.push(parseFloat($("#RSH" + i).val()));
+    
+            var valorRSH = parseFloat($("#RSH" + i).val());
+            if (isNaN(valorRSH)) {
+                restricoesPreenchidas = false;
+                break;
+            }
+            restricao.push(valorRSH);
+    
             restricoes.push(restricao);
         }
-
+    
+        // Verificar se todos os campos foram preenchidos corretamente
+        if (!zPreenchido || !restricoesPreenchidas) {
+            alert('Por favor, preencha todos os campos corretamente antes de gerar a solução.');
+            return;
+        }
+    
         // Objeto final no formato desejado
         var novoObjeto = {
             numVariaveis: numVariaveis,
@@ -131,14 +158,14 @@ $(document).ready(() =>{
             z: z,
             restricoes: restricoes
         };
-
+    
         // Verifica qual método está ativo e executa a função correspondente
         const activeElements = $('.menu li a.active');
         if (activeElements.length === 0) {
             alert('Nenhum método selecionado.\nPor favor, selecione um método para gerar a solução.');
             return;
         }
-
+    
         if (activeElements.attr('id') == "a2" && !($('#lin2').hasClass('disabled'))) {
             EnviarParaMetodoGrafico(novoObjeto);
         } else if (activeElements.attr('id') == "a4") {
@@ -149,6 +176,7 @@ $(document).ready(() =>{
             alert('Método selecionado inválido!\nTente novamente');
         }
     });
+    
 
     $('.menu li a').click(function(event) {
         handleMenuClick();
@@ -176,14 +204,13 @@ $(document).ready(() =>{
 
 //----------------------------------------------------------TEMPORÁRIO-----------------------------------------------------------
 // Função para converter os dados formatados
-// Função para converter os dados formatados
 function converterParaArrayFormatado(dados) {
     // Encontrar os dados iniciais para Z
     var dadosIniciais = dados.find(item => item.id === "dados-iniciais").value;
     var Z = [];
     Z.push(parseFloat(dadosIniciais.find(item => item.id === "Z-x1")?.value || 0));
     Z.push(parseFloat(dadosIniciais.find(item => item.id === "Z-x2")?.value || 0));
-    Z.push(0); // Adiciona o zero no final de Z conforme especificado
+    Z.push(0);
 
     // Extrair as restrições
     var restricoes = [];
