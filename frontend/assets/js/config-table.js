@@ -1,8 +1,6 @@
-// inputTabela
 $(document).ready(() =>{
     $("#gerarTabela").on('click', function (){
         var tabelaDinamica = "<table id='modelagemTabelar' class='table table-bordered nowrap mb-4 mt-1'>";
-        // tabelaDinamica += "<!--<caption>Lista de motoristas associados aos seus caminhões</caption>-->";
 
         //-------------Cabeçalho-------------//
         tabelaDinamica += "<thead><tr><th scope='col'>&nbsp;</th>";
@@ -13,23 +11,11 @@ $(document).ready(() =>{
 
         tabelaDinamica += "<th scope='col'>&lt;&gt;=</th><th scope='col'>RSH</th></tr></thead><tbody id='conteudoTabela'>";
 
-        //-------------Nomeação de variáveis-------------//
-
-            // tabelaDinamica += "<tr id='nomeDasVariaveis'><td scope='col'>Nome variável</td>";
-            
-            //     for (var i = 1; i <= $('#numVariavel').val() ; i++) {
-            //         tabelaDinamica += "<td scope='col'>";
-            //             tabelaDinamica += '<input style="border: none;" type="text" class="form-control" data-id="x' + i + '" id="nome-x'+ i +'" aria-describedby="basic-addon3 basic-addon4" maxlength="8"></input>';
-            //         tabelaDinamica +="</td>";
-            //     }
-
-            // tabelaDinamica += "<td scope='col'></td><td scope='col'></td></tr>";
-
         //-------------Tipo de problema (max-min)-------------//
 
         tabelaDinamica += "<tr id='tipoDeProblema'><td scope='col'>";
             tabelaDinamica += '<select id="min-max" class="form-select text-center" aria-label="Small select example">';
-            //tabelaDinamica += '<option selected>Tipo de problema</option>';
+            tabelaDinamica += '<option selected>Tipo de problema</option>';
             tabelaDinamica += '<option value="1">Maximização</option>';
             tabelaDinamica += '<option value="2">Minimização</option>';
             tabelaDinamica += '</select>';
@@ -78,7 +64,7 @@ $(document).ready(() =>{
         tabelaDinamica += "<td>Limites Superiores</td>"
             for(var j = 1; j <= $('#numVariavel').val() ; j++){
                 tabelaDinamica +=  "<td>" +
-                '<input style="border: none;" type="text" class="form-control" data-id="limSuperior" id="limSuperiorX'+ j+ '" aria-describedby="basic-addon3 basic-addon4" maxlength="8" value="Infinito" disabled></input>' +
+                '<input style="border: none;" type="text" class="form-control" data-id="limSuperior" id="limSuperiorX'+ j+ '" aria-describedby="basic-addon3 basic-addon4" maxlength="8" value="Inf"></input>' +
                 "</td>";
             }
         tabelaDinamica += "<td></td><td></td>" +
@@ -88,7 +74,7 @@ $(document).ready(() =>{
         "<td>Limites Inferiores</td>";
             for(var j = 1; j <= $('#numVariavel').val() ; j++){
                 tabelaDinamica +=  "<td>" +
-                '<input style="border: none;" type="number" class="form-control" data-id="limInferior" id="limInferiorX'+ j+ '" aria-describedby="basic-addon3 basic-addon4" maxlength="8" value="0" disabled></input>' +
+                '<input style="border: none;" type="number" class="form-control" data-id="limInferior" id="limInferiorX'+ j+ '" aria-describedby="basic-addon3 basic-addon4" maxlength="8" value="0"></input>' +
                 "</td>";
             }
         tabelaDinamica += "<td></td><td></td>" +
@@ -98,77 +84,125 @@ $(document).ready(() =>{
         $('#inputTabela').html(tabelaDinamica);
     });
 
-    $("#gerarSolucao").on('click', function () {
-      const activeElements = $('.menu li a.active');
-      if (activeElements.length === 0) {
-        alert('Nenhum método selecionado.\nPor favor, selecione um método para gerar a solução.');
-        return; // Prevent further execution if no active elements are found
-      }
+    // Chamada inicial
+    handleMenuClick();
+    atualizarDisponibilidadeMetodoGrafico();
 
-      // Array para armazenar todos os dados
-      var dados = [];
-  
-      // ------------- Dados Iniciais -------------
-      var dadosIniciais = [
-        { "id": "nome-x1", "value": $("#nome-x1").val() },
-        { "id": "nome-x2", "value": $("#nome-x2").val() },
-        { "id": "min-max", "value": $("#min-max").val() },
-        { "id": "Z-x1", "value": $("#Z-x1").val() },
-        { "id": "Z-x2", "value": $("#Z-x2").val() }
-      ];
-      dados.push({ "id": "dados-iniciais", "value": dadosIniciais });
-  
-      // ------------- Valores das Restrições -------------
-      for (var i = 1; i <= $('#numRestricao').val(); i++) {
-        var restricao = [];
-        for (var j = 1; j <= $('#numVariavel').val(); j++) {
-          restricao.push({ "id": "r" + i + "x" + j, "value": $("#r" + i + "x" + j).val() });
+    $("#gerarSolucao").on('click', function () {
+        var numVariaveis = parseInt($('#numVariavel').val());
+        var numRestricoes = parseInt($('#numRestricao').val());
+    
+        var tipoProblema = $("#min-max").val() === "2" ? "min" : "max";
+    
+        // Verificar se todos os campos de Z estão preenchidos
+        var z = [];
+        var zPreenchido = true;
+        for (var i = 1; i <= numVariaveis; i++) {
+            var valorZ = parseFloat($("#Z-x" + i).val());
+            if (isNaN(valorZ)) {
+                zPreenchido = false;
+                break;
+            }
+            z.push(valorZ);
         }
-        restricao.push({ "id": "r" + i, "value": $("#r" + i).val() });
-        restricao.push({ "id": "RSH" + i, "value": $("#RSH" + i).val() });
-        dados.push({ "id": "r" + i, "value": restricao });
-      }
-  
-      // ------------- Limites -------------
-      var limites = [
-        { "id": "limSuperiorX1", "value": $("#limSuperiorX1").val() },
-        { "id": "limSuperiorX2", "value": $("#limSuperiorX2").val() },
-        { "id": "limInferiorX1", "value": $("#limInferiorX1").val() },
-        { "id": "limInferiorX2", "value": $("#limInferiorX2").val() }
-      ];
-      dados.push({ "id": "limites", "value": limites });
-  
-      console.log('Array final:', dados);
-      // console.log('\n' + converterParaArrayFormatado(dados));
-      chamarConversor(dados);
-  
+    
+        // Verificar se todos os campos de restrição estão preenchidos
+        var restricoesPreenchidas = true;
+        var restricoes = [];
+        for (var i = 1; i <= numRestricoes; i++) {
+            var restricao = [];
+            for (var j = 1; j <= numVariaveis; j++) {
+                var valorRestricao = parseFloat($("#r" + i + "x" + j).val());
+                if (isNaN(valorRestricao)) {
+                    restricoesPreenchidas = false;
+                    break;
+                }
+                restricao.push(valorRestricao);
+            }
+            var tipoRestricao = $("#r" + i).val();
+            if (!restricoesPreenchidas) break; // Se já não estiver preenchido, sair do loop
+    
+            if (tipoRestricao === "1") {
+                restricao.unshift("<=");
+            } else if (tipoRestricao === "2") {
+                restricao.unshift("<");
+            } else if (tipoRestricao === "3") {
+                restricao.unshift(">=");
+            } else if (tipoRestricao === "4") {
+                restricao.unshift(">");
+            } else if (tipoRestricao === "5") {
+                restricao.unshift("=");
+            }
+    
+            var valorRSH = parseFloat($("#RSH" + i).val());
+            if (isNaN(valorRSH)) {
+                restricoesPreenchidas = false;
+                break;
+            }
+            restricao.push(valorRSH);
+    
+            restricoes.push(restricao);
+        }
+    
+        // Verificar se todos os campos foram preenchidos corretamente
+        if (!zPreenchido || !restricoesPreenchidas) {
+            alert('Por favor, preencha todos os campos corretamente antes de gerar a solução.');
+            return;
+        }
+    
+        // Objeto final no formato desejado
+        var novoObjeto = {
+            numVariaveis: numVariaveis,
+            numRestricoes: numRestricoes,
+            tipo: tipoProblema,
+            z: z,
+            restricoes: restricoes
+        };
+    
+        // Verifica qual método está ativo e executa a função correspondente
+        const activeElements = $('.menu li a.active');
+        if (activeElements.length === 0) {
+            alert('Nenhum método selecionado.\nPor favor, selecione um método para gerar a solução.');
+            return;
+        }
+    
+        if (activeElements.attr('id') == "a2" && !($('#lin2').hasClass('disabled'))) {
+            EnviarParaMetodoGrafico(novoObjeto);
+        } else if (activeElements.attr('id') == "a4") {
+            chamarConversor(novoObjeto);
+        } else if (activeElements.attr('id') == "a1") {
+            console.log('Novo objeto:', novoObjeto);
+        } else {
+            alert('Método selecionado inválido!\nTente novamente');
+        }
     });
+    
 
     $('.menu li a').click(function(event) {
-      event.preventDefault(); 
-  
-      const clickedElementId = $(this).attr('id');
-      const activeViewClass = 'active';
-  
-      $('.menu li a').removeClass(activeViewClass);
-      $('.menu li').removeAttr('style'); 
-  
-      $(this).addClass(activeViewClass);
-  
-      const clickedElementIdWithoutHash = clickedElementId.slice(1); 
-      const clickedElement = $('#lin' + clickedElementIdWithoutHash);
-  
-      clickedElement.css('background-color', '#920686');
-      clickedElement.css('color', 'black');
-      clickedElement.css('text-shadow', '0px 0px 5px #fff');
-      clickedElement.css('font-weight', 'bold');
-      clickedElement.css('font-size', '15px');
+        handleMenuClick();
+    });
+
+    // Adicionar evento para atualização quando o número de variáveis é alterado
+    $('#numVariavel').on('input', function() {
+        handleMenuClick();
+    });
+
+    // Evento para atualizar sempre que o número de variáveis mudar
+    $('#numVariavel').on('input', function() {
+        atualizarDisponibilidadeMetodoGrafico();
+    });
+
+    // Evento de clique no método gráfico
+    $('#a2').click(function(event) {
+        if ($(this).parent().hasClass('disabled')) {
+            event.preventDefault();
+            alert('A opção Gráfico não está disponível quando há mais de 2 variáveis.');
+        }
     });
   });
   
 
 //----------------------------------------------------------TEMPORÁRIO-----------------------------------------------------------
-// Função para converter os dados formatados
 // Função para converter os dados formatados
 function converterParaArrayFormatado(dados) {
     // Encontrar os dados iniciais para Z
@@ -176,7 +210,7 @@ function converterParaArrayFormatado(dados) {
     var Z = [];
     Z.push(parseFloat(dadosIniciais.find(item => item.id === "Z-x1")?.value || 0));
     Z.push(parseFloat(dadosIniciais.find(item => item.id === "Z-x2")?.value || 0));
-    Z.push(0); // Adiciona o zero no final de Z conforme especificado
+    Z.push(0);
 
     // Extrair as restrições
     var restricoes = [];
@@ -206,5 +240,88 @@ function converterParaArrayFormatado(dados) {
 
 function chamarConversor(dados){
   localStorage.setItem('dados', JSON.stringify(converterParaArrayFormatado(dados)));
-  window.location.href = 'D:/Xampp/htdocs/projetoXis/projeto-xis/frontend/resolution.html'; // Redirecionamento para B.html
+  window.location.href = 'D:/Xampp/htdocs/projetoXis/projeto-xis/frontend/resolution.html';
+}
+
+
+function EnviarParaMetodoGrafico(dados){
+    localStorage.setItem('dados', JSON.stringify(dados));
+    window.location.href = 'D:/Xampp/htdocs/projetoXis/projeto-xis/frontend/graphical.html';
+}
+//----------------------------------------------------------STYLE-----------------------------------------------------------
+
+// Função para manipular cliques nos itens do menu
+function handleMenuClick() {
+    const activeViewClass = 'active';
+    const disabledClass = 'disabled';
+
+    $('.menu li a').click(function(event) {
+        event.preventDefault();
+
+        const clickedElementId = $(this).attr('id');
+        // Verificar se o elemento clicado é "Gráfico" e se o número de variáveis é 3
+        if (clickedElementId === 'a2' && $('#numVariavel').val() == 3) {
+            // Desativar a opção "Gráfico" visualmente e logicamente
+            $(this).parent().addClass(disabledClass);
+            $("#a2").removeClass(activeViewClass);
+            $('#a2').removeAttr('style');
+            $(this).css({
+                'background-color': '#f2f2f2',
+                'color': '#bbb',
+                'text-shadow': 'none',
+                'font-weight': 'normal',
+                'font-size': '15px'
+            });
+
+            // Remover classe ativa de todos os elementos do menu
+            $('.menu li a').removeClass(activeViewClass);
+
+            return; // Sair da função após desativar "Gráfico"
+        }
+
+        // Remover classes ativas de todos os elementos do menu
+        $('.menu li a').removeClass(activeViewClass);
+        $('.menu li').removeAttr('style');
+
+        // Verificar se o elemento está desabilitado
+        if (!$(this).parent().hasClass(disabledClass)) {
+            $(this).addClass(activeViewClass);
+
+            // Estilizar o elemento clicado
+            const clickedElementIdWithoutHash = clickedElementId.slice(1);
+            const clickedElement = $('#lin' + clickedElementIdWithoutHash);
+            clickedElement.css({
+                'background-color': '#920686',
+                'color': 'black',
+                'text-shadow': '0px 0px 5px #fff',
+                'font-weight': 'bold',
+                'font-size': '15px'
+            });
+        } else {
+            // Adicionar classe disabled e estilos específicos ao elemento pai (li)
+            $(this).parent().addClass(disabledClass);
+
+            // Remover classe active do elemento clicado
+            $(this).removeClass(activeViewClass);
+
+            // Estilizar o elemento clicado quando desabilitado
+            $(this).css({
+                'background-color': '#f2f2f2',
+                'color': '#bbb',
+                'text-shadow': 'none',
+                'font-weight': 'normal',
+                'font-size': '15px'
+            });
+        }
+    });
+}
+
+// Função para atualizar a disponibilidade do método gráfico
+function atualizarDisponibilidadeMetodoGrafico() {
+    var numVariaveis = parseInt($('#numVariavel').val());
+    if (numVariaveis > 2) {
+        $('#a2').parent().addClass('disabled');
+    } else {
+        $('#a2').parent().removeClass('disabled');
+    }
 }
