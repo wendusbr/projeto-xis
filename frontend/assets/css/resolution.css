@@ -9,3 +9,11 @@
 p, tr, td{
     margin-bottom: 3px;
 }
+
+h1{
+    text-align: start;
+}
+
+td{
+    width: 175px;
+}

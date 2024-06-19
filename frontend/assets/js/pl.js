@@ -8,8 +8,19 @@
     };
 */
 
+document.addEventListener("DOMContentLoaded", function() {
+    // Recuperando os dados do localStorage
+    const dadosString = localStorage.getItem('dados');
+    const dados = JSON.parse(dadosString);
+    // console.log(dados);
+    // localStorage.clear();
+    gerarTabelaHTML(dados);
+    simplexMethod(dados);
+});
+
+var M = 1000;
+
 function simplexMethod(entrada){
-    var M = 1000;
 
     if(entrada.tipo == 'min'){
         let z = [];
@@ -131,7 +142,7 @@ function simplexMin(entrada){
 
     let it = 0;
     while(1){
-        console.log(z, c, tabelaSimplex, zj, pesoZj);
+        // console.log(z, c, tabelaSimplex, zj, pesoZj);
 
         writeIterationMin(it, z, c, tabelaSimplex, zj, pesoZj);
         
@@ -208,14 +219,34 @@ function simplexMin(entrada){
 function writeIterationMin(it, z, c, tabelaSimplex, zj, pesoZj){
     var table = `
         <h1>It ${it}</h1>
-        <table class="table mb-5">
+        <table class="table mb-5 mt-1">
     `;
 
-        table += '<tr><td>LE</td>';
+        table += '<tr><td>Z &rarr;</td>';
         z.forEach(element => {
             table += `<td>${element}</td>`
         });
-        table += '<td>LD</td></tr>'
+        table += '<td></td></tr>';
+
+        table += '<tr><td>Variáveis &rarr;</td>';
+        for(let i=0; i<z.length; i++){
+            table += '<td class="table-secondary">';
+            switch(z[i]){
+                case 0:
+                    table += 'S';
+                    break;
+                
+                case M:
+                    table += 'A';
+                    break;
+
+                default:
+                    table += 'X';
+                    break;
+            }
+            table += `${i+1}</td>`;
+        }
+        table += '<td style="font-size: 12px;">X: variável padrão<br>S: variável auxiliar<br>A: variável artificial</td></tr>';
 
         for(let i=0; i<tabelaSimplex.length; i++){
             table += '<tr>';
@@ -226,23 +257,23 @@ function writeIterationMin(it, z, c, tabelaSimplex, zj, pesoZj){
             });
 
             table += '</tr>';
-
         }
 
-        table += '<tr><td>Zj</td>'
+        table += '<tr><td>Zj &rarr;</td>'
         zj.forEach(element => {
             table += `<td>${element}</td>`
         });
         table += '</tr>';
 
-        table += '<tr><td>pesoZj</td>'
+        table += '<tr><td>pesoZj &rarr;</td>'
         pesoZj.forEach(element => {
             table += `<td>${element}</td>`
         });
-        table += '</tr>';
+        table += '<td></td></tr>';
 
         table += '</table>';
-        document.body.innerHTML += table; // Adapte como quiser
+        // document.body.innerHTML += table; // Adapte como quiser
+        document.getElementById('modelagem-passos').innerHTML += table;
 }
 
 // function simplexMaxTable(entrada){

@@ -39,6 +39,10 @@ td, tr, option, .form-select{
     font-weight: 500;
 }
 
+td{
+    max-width: 190px;
+}
+
 .vertical {
     vertical-align: middle;
     display: table-cell;
