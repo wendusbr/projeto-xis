@@ -14,29 +14,23 @@
             <img src="assets/img/logo.png" alt="" width="150px">
         </a>
     </header>
-    <div class="container-fluid">
+    <section class="container-fluid">
         <div id="metodo-gerador" class="row p-3">
-            <div class="col-lg-3 col-md-3 col-sm-5 col-6">
-                <Select id="metodo" class="form-select">
-                    <option value="" selected>Programação Linear</option>
-                </Select>
-            </div>
-            <button id="gerarTabela" class="btn btn-primary">Gerar tabela</button>
+            <Select id="metodo" class="form-select">
+                <option value="" selected>Programação Linear</option>
+            </Select>
         </div>
-        
         <div class="px-3 my-3">
             <div class="mb-3 row">
-                <label id="l1" for="numVariavel" class="col-sm-2 col-4 col-form-label">Nº de variáveis</label>
-                <div class="col-sm-1 col-2">
-                  <input type="number" class="form-control" id="numVariavel" min="1" value="1">
-                </div>
+                <label id="l1" for="numVariavel">Nº de variáveis</label>
+                <input type="number" class="form-control" id="numVariavel" min="1" value="1">
             </div>
             <div class="mb-3 row">
-                <label id="l2" for="numRestricao" class="col-sm-2 col-4 col-form-label">Nº de restrições</label>
-                <div class="col-sm-1 col-2">
-                  <input type="number" class="form-control" id="numRestricao" min="1" value="1">
-                </div>
+                <label id="l2" for="numRestricao">Nº de restrições</label>
+                <input type="number" class="form-control" id="numRestricao" min="1" value="1">
             </div>
+        
+            <button id="gerarTabela" class="btn btn-primary">Gerar tabela</button>
         </div>
 
         <div class="text-center row justify-content-center">
@@ -44,32 +38,32 @@
                 <!-- Tabela dinâmicamente gerada -->
             </div>
         </div>
-    </div>
+        <div id="metodos" class="row px-5 mt-3">
+            <div id="text" class="col-md-3 col-sm-4 col-5">
+                Método de resolução adotado
+            </div>
+            <div class="col alinhamentoGeral" id="selectMetodo">
+                <nav>
+                    <ul class="menu">
+                        <!-- <li id="lin1"><a href="#" id="a1">Geométrico</a></li> -->
+                        <li id="lin2"><a href="#" id="a2">Gráfico</a></li>
+                            <li id="lin3"><a href="#" id="a3">Simplex</a>
+                            <!-- <ul id="sub-metodos">
+                                <li class="sub" id="lin4"><a href="#" class="sub" id="a4">Solução Final</a></li>
+                                <li class="sub" id="lin5"><a href="#" class="sub" id="a5">Iterações</a></li>
+                            </ul> -->
+                            </li>
+                            <!-- <li id="lin6"><a href="#" id="a6">Tabular</a></li> -->
+                    </ul>
+                    </nav>
+            </div>
 
-    <div id="metodos" class="row px-5 mt-3">
-        <div id="text" class="col-md-3 col-sm-4 col-5">
-            Método de resolução adotado
+            <div class="text-end mb-5">
+                <button id="btnVoltar" class="btn btn-secondary">Voltar ao Menu</button>
+                <button id="gerarSolucao" class="btn btn-success">Resolver</button>
+            </div>
         </div>
-        <div class="col alinhamentoGeral" id="selectMetodo">
-            <nav>
-                <ul class="menu">
-                    <li id="lin1"><a href="#" id="a1">Geométrico</a></li>
-                    <li id="lin2"><a href="#" id="a2">Gráfico</a></li>
-                      <li id="lin3"><a href="#" id="a3">Algébrico</a>
-                        <ul id="sub-metodos">
-                            <li class="sub" id="lin4"><a href="#" class="sub" id="a4">Solução Final</a></li>
-                            <li class="sub" id="lin5"><a href="#" class="sub" id="a5">Iterações</a></li>
-                        </ul>
-                      </li>
-                      <li id="lin6"><a href="#" id="a6">Tabular</a></li>
-              </ul>
-              </nav>
-        </div>
-        <div class="col alinhamentoGeral">
-            <button id="btnVoltar" class="btn btn-primary">Voltar ao Menu</button>
-            <button id="gerarSolucao" class="btn btn-primary">Gerar Resolução</button>
-        </div>
-    </div>
+    </section>
 
     <footer class="fixed-bottom text-center bg-white">
         <p>Copyright &copy; XIS 2024</p>
