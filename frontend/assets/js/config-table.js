@@ -1,4 +1,5 @@
 $(document).ready(() =>{
+    // localStorage.clear();
     $("#gerarTabela").on('click', function (){
         var tabelaDinamica = "<table id='modelagemTabelar' class='table table-bordered nowrap mb-4 mt-1'>";
 
@@ -44,9 +45,9 @@ $(document).ready(() =>{
             tabelaDinamica +=  "<td>";
                 tabelaDinamica += '<select id="r'+ i + '" class="form-select text-center" aria-label="Small select example">';
                     tabelaDinamica += '<option value="1" selected>&lt;=</option>';
-                    tabelaDinamica += '<option value="2">&lt;</option>';
+                    // tabelaDinamica += '<option value="2">&lt;</option>';
                     tabelaDinamica += '<option value="3">&gt;=</option>';
-                    tabelaDinamica += '<option value="4">&gt;</option>';
+                    // tabelaDinamica += '<option value="4">&gt;</option>';
                     tabelaDinamica += '<option value="5">=</option>';
                 tabelaDinamica += '</select>';
             tabelaDinamica +=  "</td>";
@@ -64,7 +65,7 @@ $(document).ready(() =>{
         tabelaDinamica += "<td>Limites Superiores</td>"
             for(var j = 1; j <= $('#numVariavel').val() ; j++){
                 tabelaDinamica +=  "<td>" +
-                '<input style="border: none;" type="text" class="form-control" data-id="limSuperior" id="limSuperiorX'+ j+ '" aria-describedby="basic-addon3 basic-addon4" maxlength="8" value="Inf"></input>' +
+                '<input disabled style="border: none;" type="text" class="form-control" data-id="limSuperior" id="limSuperiorX'+ j+ '" aria-describedby="basic-addon3 basic-addon4" maxlength="8" value="Inf"></input>' +
                 "</td>";
             }
         tabelaDinamica += "<td></td><td></td>" +
@@ -74,7 +75,7 @@ $(document).ready(() =>{
         "<td>Limites Inferiores</td>";
             for(var j = 1; j <= $('#numVariavel').val() ; j++){
                 tabelaDinamica +=  "<td>" +
-                '<input style="border: none;" type="number" class="form-control" data-id="limInferior" id="limInferiorX'+ j+ '" aria-describedby="basic-addon3 basic-addon4" maxlength="8" value="0"></input>' +
+                '<input disabled style="border: none;" type="number" class="form-control" data-id="limInferior" id="limInferiorX'+ j+ '" aria-describedby="basic-addon3 basic-addon4" maxlength="8" value="0"></input>' +
                 "</td>";
             }
         tabelaDinamica += "<td></td><td></td>" +
@@ -168,8 +169,8 @@ $(document).ready(() =>{
     
         if (activeElements.attr('id') == "a2" && !($('#lin2').hasClass('disabled'))) {
             EnviarParaMetodoGrafico(novoObjeto);
-        } else if (activeElements.attr('id') == "a4") {
-            chamarConversor(novoObjeto);
+        } else if (activeElements.attr('id') == "a3") {
+            EnviarParaMetodoTabular(novoObjeto);
         } else if (activeElements.attr('id') == "a1") {
             console.log('Novo objeto:', novoObjeto);
         } else {
@@ -202,51 +203,18 @@ $(document).ready(() =>{
   });
   
 
-//----------------------------------------------------------TEMPORÁRIO-----------------------------------------------------------
-// Função para converter os dados formatados
-function converterParaArrayFormatado(dados) {
-    // Encontrar os dados iniciais para Z
-    var dadosIniciais = dados.find(item => item.id === "dados-iniciais").value;
-    var Z = [];
-    Z.push(parseFloat(dadosIniciais.find(item => item.id === "Z-x1")?.value || 0));
-    Z.push(parseFloat(dadosIniciais.find(item => item.id === "Z-x2")?.value || 0));
-    Z.push(0);
+//----------------------------------------------------------ENVIO-----------------------------------------------------------
 
-    // Extrair as restrições
-    var restricoes = [];
-    for (var i = 1; i <= dados.length - 2; i++) { // Iterar sobre as restrições, excluindo "dados-iniciais" e "limites"
-        var restricao = dados.find(item => item.id === "r" + i);
-        if (restricao) {
-            var linhaRestricao = [];
-            linhaRestricao.push(parseFloat(restricao.value.find(item => item.id === "r" + i + "x1")?.value || 0));
-            linhaRestricao.push(parseFloat(restricao.value.find(item => item.id === "r" + i + "x2")?.value || 0));
 
-            var RSH = parseFloat(restricao.value.find(item => item.id === "RSH" + i)?.value || 0);
-            if (isNaN(RSH)) {
-                console.warn(`RSH não encontrado ou inválido para RSH${i}`);
-                RSH = 0; // Definir como 0 se RSH não for um número válido
-            }
-            linhaRestricao.push(RSH);
-
-            restricoes.push(linhaRestricao);
-        } else {
-            console.warn(`Restrição não encontrada para r${i}`);
-        }
-    }
-
-    // Retornar o array formatado com Z seguido das restrições
-    return [Z].concat(restricoes);
-}
-
-function chamarConversor(dados){
-  localStorage.setItem('dados', JSON.stringify(converterParaArrayFormatado(dados)));
-  window.location.href = 'D:/Xampp/htdocs/projetoXis/projeto-xis/frontend/resolution.html';
+function EnviarParaMetodoTabular(dados){
+  localStorage.setItem('dados', JSON.stringify(dados));
+  window.location.href = 'resolution.html';
 }
 
 
 function EnviarParaMetodoGrafico(dados){
     localStorage.setItem('dados', JSON.stringify(dados));
-    window.location.href = 'D:/Xampp/htdocs/projetoXis/projeto-xis/frontend/graphical.html';
+    window.location.href = 'graphical.html';
 }
 //----------------------------------------------------------STYLE-----------------------------------------------------------
 

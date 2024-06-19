@@ -23,7 +23,14 @@ function gerarTabelaHTML(arrayDados) {
             }
         }
         var rhs = arrayDados.restricoes[i][numVariaveis + 1];
-        var sinal = arrayDados.restricoes[i][0] === "<=" ? "≤" : "≥";
+        var sinal; //= arrayDados.restricoes[i][0] === "<=" ? "≤" : "≥";
+        if(arrayDados.restricoes[i][0] === "<="){
+            sinal = "≤";
+        } else if(arrayDados.restricoes[i][0] === ">="){
+            sinal = "≥";
+        } else{
+            sinal = "=";
+        }
         restricoes += "<p>" + restricao + sinal + " " + rhs + "</p>";
     }
 
