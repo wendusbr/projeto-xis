@@ -141,11 +141,8 @@ function simplexMin(entrada){
     let pesoZj = entrada[4];
 
     let it = 0;
-    while(1){
-        // console.log(z, c, tabelaSimplex, zj, pesoZj);
 
-        writeIterationMin(it, z, c, tabelaSimplex, zj, pesoZj);
-        
+    while(1){        
         // Descobrir coluna pivotal
         let minPesoZj=0, colunaPivotal;
         for(let i=0; i<z.length; i++){
@@ -155,7 +152,7 @@ function simplexMin(entrada){
             }
         }
         if(minPesoZj === 0)
-            return;
+            break;
         
         // Descobrir linha pivotal
         let pesoRestricao, linhaPivotal;
@@ -169,9 +166,11 @@ function simplexMin(entrada){
         }
 
         if(!pesoRestricao)
-            return;
+            break;
 
         let elementoPivotal = tabelaSimplex[linhaPivotal][colunaPivotal];
+
+        writeIterationMin(it, z, c, tabelaSimplex, zj, pesoZj, linhaPivotal, colunaPivotal);
 
         // Divide toda linha pivotal pelo elemento pivotal
         if(elementoPivotal != 1){
@@ -214,66 +213,69 @@ function simplexMin(entrada){
 
         it++;
     }
+
+    writeIterationMin(it, z, c, tabelaSimplex, zj, pesoZj);
 }
 
-function writeIterationMin(it, z, c, tabelaSimplex, zj, pesoZj){
+function writeIterationMin(it, z, c, tabelaSimplex, zj, pesoZj, linhaPivotal, colunaPivotal){
     var table = `
-        <h1>It ${it}</h1>
+        <h1>It ${it} <span class="subindice">(M = ${M})</span></h1>
+        <div class="table-responsive">
         <table class="table mb-5 mt-1">
     `;
 
-        table += '<tr><td>Z &rarr;</td>';
-        z.forEach(element => {
-            table += `<td>${element}</td>`
-        });
-        table += '<td></td></tr>';
+    table += '<tr><td class="fw-bold">Z &rarr;</td>';
+    z.forEach(element => {
+        element == M ? table += `<td>M</td>` : table += `<td>${element}</td>`;
+    });
+    table += '<td class="fw-bold">LD &darr;</td></tr>';
 
-        table += '<tr><td>Variáveis &rarr;</td>';
-        for(let i=0; i<z.length; i++){
-            table += '<td class="table-secondary">';
-            switch(z[i]){
-                case 0:
-                    table += 'S';
-                    break;
-                
-                case M:
-                    table += 'A';
-                    break;
+    table += '<tr class="fw-bold"><td>Variáveis &rarr;</td>';
+    for(let i=0; i<z.length; i++){
+        table += '<td>';
+        switch(z[i]){
+            case 0:
+                table += 'S';
+                break;
+            
+            case M:
+                table += 'A';
+                break;
 
-                default:
-                    table += 'X';
-                    break;
-            }
-            table += `${i+1}</td>`;
+            default:
+                table += 'X';
+                break;
         }
-        table += '<td style="font-size: 12px;">X: variável padrão<br>S: variável auxiliar<br>A: variável artificial</td></tr>';
+        table += `<span class="subindice">${i+1}</span></td>`;
+    }
+    table += '<td style="font-size: 12px;">X: variável padrão<br>S: variável auxiliar<br>A: variável artificial</td></tr>';
 
-        for(let i=0; i<tabelaSimplex.length; i++){
-            table += '<tr>';
-            table += `<td>${c[i]}</td>`;
+    for(let i=0; i<tabelaSimplex.length; i++){
+        table += '<tr>';
+        table += `<td>${c[i]}</td>`;
 
-            tabelaSimplex[i].forEach(element => {
-                table += `<td>${element}</td>`
-            });
-
-            table += '</tr>';
+        for(let j=0; j<tabelaSimplex[i].length; j++){
+            i==linhaPivotal || j==colunaPivotal ? table += `<td class="table-info">${tabelaSimplex[i][j]}</td>` : table += `<td>${tabelaSimplex[i][j]}</td>`;
         }
 
-        table += '<tr><td>Zj &rarr;</td>'
-        zj.forEach(element => {
-            table += `<td>${element}</td>`
-        });
         table += '</tr>';
+    }
 
-        table += '<tr><td>pesoZj &rarr;</td>'
-        pesoZj.forEach(element => {
-            table += `<td>${element}</td>`
-        });
-        table += '<td></td></tr>';
+    table += '<tr><td class="fw-bold">Zj &rarr;</td>'
+    zj.forEach(element => {
+        table += `<td>${element}</td>`
+    });
+    table += '</tr>';
 
-        table += '</table>';
-        // document.body.innerHTML += table; // Adapte como quiser
-        document.getElementById('modelagem-passos').innerHTML += table;
+    table += '<tr><td class="fw-bold">pesoZj &rarr;</td>'
+    pesoZj.forEach(element => {
+        table += `<td>${element}</td>`
+    });
+    table += '<td></td></tr>';
+
+    table += '</table></div>';
+    // document.body.innerHTML += table; // Adapte como quiser
+    document.getElementById('modelagem-passos').innerHTML += table;
 }
 
 // function simplexMaxTable(entrada){
