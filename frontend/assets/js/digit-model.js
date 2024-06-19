@@ -43,7 +43,7 @@ function gerarTabelaHTML(arrayDados) {
         }
     }
 
-    var tabelaHTML = `<table class="no-borde centro">
+    var tabelaHTML = `<table style="width: 400px;" class="no-borde centro">
                         <tbody>
                             <tr>
                                 <td>
