@@ -117,7 +117,7 @@ document.addEventListener("DOMContentLoaded", function() {
         return { x: x, y: y };
     }
 
-    // Função para obter cor aleatória
+    // Função para obter cor aleatória - mó bagunça
     function getRandomColor() {
         const letters = '0123456789ABCDEF';
         let color = '#';
@@ -135,14 +135,30 @@ document.addEventListener("DOMContentLoaded", function() {
         if (coeficientes[1] !== 0) {
             const yMin = (rhs - coeficientes[0] * 0) / coeficientes[1];
             path += ` L 0,${yMin}`;
+        } else {
+            // Coeficiente de x2 é zero, então a reta é quase paralela ao eixo y
+            path += ` L 0,0.0001`; // Vai até um valor muito próximo de zero no eixo y
         }
 
         for (let x = 0; x <= xMax; x += 0.1) {
-            const y = (rhs - coeficientes[0] * x) / coeficientes[1];
-            path += ` L ${x},${y}`;
+            if (coeficientes[1] !== 0) {
+                const y = (rhs - coeficientes[0] * x) / coeficientes[1];
+                path += ` L ${x},${y}`;
+            } else {
+                // Se coeficiente de x2 é zero, a reta é quase paralela ao eixo y
+                path += ` L ${x},0.0001`; // Continua em um valor muito próximo de zero no eixo y
+            }
         }
 
-        path += ` L ${xMax},0 Z`;
+        if (coeficientes[0] !== 0) {
+            const xFinal = rhs / coeficientes[0];
+            path += ` L ${xFinal},0`;
+        } else {
+            // Coeficiente de x1 é zero, então a reta é quase paralela ao eixo x2
+            path += ` L 0.0001,0`; // Vai até um valor muito próximo de zero no eixo x1
+        }
+
+        path += ` Z`;
 
         return path;
     }
