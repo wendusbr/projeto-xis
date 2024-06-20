@@ -206,8 +206,6 @@ function simplexMax(entrada){
     let it = 0;
 
     while(1){
-        console.log(tabelaSimplex);
-
         // Descobrir coluna pivotal
         let pesoZ=0, colunaPivotal;
         for(let i=1; i<tabelaSimplex[0].length-1; i++){
@@ -260,9 +258,8 @@ function simplexMax(entrada){
     }
 
     writeMaxTableFront(it, tabelaSimplex);
+    console.log(tabelaSimplex);
 }
-
-
 
 function simplexMin(entrada){
     let z = entrada[0];
@@ -346,6 +343,7 @@ function simplexMin(entrada){
     }
 
     writeMinTableFront(it, z, c, tabelaSimplex, zj, pesoZj);
+    console.log(z, c, tabelaSimplex, zj, pesoZj);
 }
 
 function writeHeaderMaxTableFront(tabelaSimplex){

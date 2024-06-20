@@ -1,16 +1,33 @@
 MÁX
-[[50, 80, 0], [1, 2, 120], [1, 1, 90]]
+{
+    numVariaveis: 2,
+    numRestricoes: 2,
+    tipo: 'max',
+    z: [50, 80],
+    restricoes: [['<=', 1, 2, 120], ['<=', 1, 1, 90]]
+}
  
-[[3,5,0],[1,0,4],[0,2,12],[3,2,18]]
+{
+    numVariaveis: 2,
+    numRestricoes: 3,
+    tipo: 'max',
+    z: [3, 5],
+    restricoes: [['<=', 1, 0, 4], ['<=', 0, 2, 12], ['<=', 3, 2, 18]]
+}
 
 MIN
-[[3,8,0], [1,4,3.5], [1,2,2.5]]
+{
+    numVariaveis: 2,
+    numRestricoes: 2,
+    tipo: 'min',
+    z: [3,8],
+    restricoes: [['>=', 1, 4, 3.5], ['>=', 1, 2, 2.5]]
+}
 
-FORMATO DADOS
 {
     numVariaveis: 2, 
     numRestricoes: 3, 
     tipo: 'min', 
-    z:[0.4, 0.5], 
-    restricoes:[['<=', 0.3, 0.1, 2.7], ['=', 0.5, 0.5, 6], ['>=', 0.6, 0.4, 6]]
+    z: [0.4, 0.5], 
+    restricoes: [['<=', 0.3, 0.1, 2.7], ['=', 0.5, 0.5, 6], ['>=', 0.6, 0.4, 6]]
 };
