@@ -10,23 +10,22 @@
     <link rel="stylesheet" href="assets/css/graphical.css">
 </head>
 <body class="bg-body-secondary">
-    <header class="fixed-top bg-white px-3 mb-5">
+    <header class="bg-white px-3">
         <a href="index.html">
             <img src="assets/img/logo.png" alt="" width="150px">
         </a>
     </header>
-    <section class="mt-5 container-fluid">
-        <div class="row text-center mx-2 mb-2 mt-4">
-            <h2 class="mt-4">Situação problema</h2>
+    <div class="container-fluid">
+        <div class="row text-center mx-2 my-2">
+            <h2>Situação problema</h2>
         </div>
-        <div class="row justify-content-center">
-            <div class="text-center px-2 mt-3 col-12 col-sm-8 col-md-8">
-                <div id="plot-graphic">
-                    <div id="myPlot" style="height:500px;"></div>
-                </div>
+        <div class="text-center row justify-content-center px-5 mt-3">
+            <div id="plot-graphic" class="col-4 col-sm-12 col-md-8">              
+                <div id="myPlot" style="width:100%;height:500px;"></div>
             </div>
             <div class="mt-3 col-4 col-sm-6 col-md-4">
-                <div id="modelagem-feita"></div>
+                <div id="modelagem-feita">
+                </div>
                 <button id="btnVoltar" class="btn btn-primary">Modificar Problema</button>
             </div>
         </div>
@@ -40,6 +39,6 @@
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
     <script src="assets/bootstrap-5.3.3-dist/js/bootstrap.bundle.min.js"></script>
     <script src="assets/js/scriptsgraphical.js"></script>
-    <script src="assets/js/pl.js"></script>
+    <script src="assets/js/modules/pl.js"></script>
 </body>
 </html>
