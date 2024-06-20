@@ -165,8 +165,8 @@ document.addEventListener("DOMContentLoaded", function() {
 
     function getPath(coeficientes, rhs, tipo) {
         const xMax = 15; // Limite de x para visualização
-        const yMax = 15;
-
+        const yMax = 15; // Limite de y para visualização
+    
         if (tipo === '<=') {
             let path = `M 0,0`;
             for (let x = 0; x <= xMax; x += 0.1) {
@@ -186,19 +186,30 @@ document.addEventListener("DOMContentLoaded", function() {
             return path + ` L ${xMax},0 Z`;
         } else if (tipo === '>=') {
             let path = `M 0,${yMax}`;
+            let lastX = 0;
+            let lastY = yMax;
+    
+            // Percorrer o eixo x até xMax
             for (let x = 0; x <= xMax; x += 0.1) {
                 let y;
                 if (coeficientes[1] !== 0) {
                     y = (rhs - coeficientes[0] * x) / coeficientes[1];
-                    if (y >= 0) { // Garantir que y seja maior ou igual a 0
-                        path += ` L ${x},${y}`;
-                    }
                 } else {
                     y = yMax; // Para coeficiente x2 = 0, continuamos na altura máxima definida
+                }
+    
+                // Se encontrarmos um ponto válido, atualizamos o path
+                if (y >= 0 && y <= yMax) {
                     path += ` L ${x},${y}`;
+                    lastX = x;
+                    lastY = y;
                 }
             }
-            return path + ` L ${xMax},${yMax} Z`;
+    
+            // Conectar o último ponto com o canto inferior direito e o canto inferior esquerdo
+            path += ` L ${xMax},${yMax} L 0,${yMax} L 0,${lastY} Z`;
+    
+            return path;
         } else {
             // Se tipo === '=', retorna apenas a linha, sem área sombreada
             let path = `M 0,0`;
