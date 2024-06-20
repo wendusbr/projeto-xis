@@ -5,6 +5,8 @@ MÁX
 
 MIN
 [[3,8,0], [1,4,3.5], [1,2,2.5]]
+
+FORMATO DADOS
 {
     numVariaveis: 2, 
     numRestricoes: 3, 
