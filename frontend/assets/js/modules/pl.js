@@ -3,8 +3,19 @@ var M = 1000000;
 function simplexMethod(entrada){
 
     if(entrada.tipo == 'max'){
+        /* 
+            Formato Tabela Simplex para maximização:
+
+            0[Linha Z]
+            1[Restrição 1]
+            2[Restrição 2]
+            ...
+            n[Restrição n]
+        */
+
         let tabelaSimplex = [];
 
+        // Linha Z
         let z = [1];
 
         entrada.z.forEach(element => {
@@ -34,6 +45,7 @@ function simplexMethod(entrada){
         let identidade = entrada.numVariaveis;
         let incremento;
 
+        // Linhas restrições
         for(let i=0; i<entrada.numRestricoes; i++){
             let restricao = [0];
 
@@ -81,7 +93,7 @@ function simplexMethod(entrada){
                 }  
             }
             identidade += incremento;
-            restricao.push(entrada.restricoes[i][entrada.restricoes[i].length-1]);
+            restricao.push(entrada.restricoes[i][entrada.restricoes[i].length-1]); // LD
 
             tabelaSimplex.push(restricao);
         }
@@ -346,6 +358,7 @@ function simplexMin(entrada){
     console.log(z, c, tabelaSimplex, zj, pesoZj);
 }
 
+var tableHeader;
 function writeHeaderMaxTableFront(tabelaSimplex){
     tableHeader = '';
 
