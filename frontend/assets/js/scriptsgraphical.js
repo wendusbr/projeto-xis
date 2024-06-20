@@ -9,8 +9,8 @@ document.addEventListener("DOMContentLoaded", function() {
     const traces = [];
     const shapes = [];
 
-    // Iterando sobre as restrições para criar os traces (linhas no gráfico)
     dados.restricoes.forEach(function(restricao, index) {
+        const tipo = restricao[0]; // Tipo da restrição: <=, >= ou =
         const coeficientes = restricao.slice(1, -1); // Coeficientes da restrição
         const rhs = restricao[restricao.length - 1]; // Lado direito da restrição
 
@@ -28,25 +28,64 @@ document.addEventListener("DOMContentLoaded", function() {
         };
 
         // Gerar pontos da restrição
-        for (let x = 0; x <= 5 * rhs; x += 0.1) {
-            const y = (rhs - coeficientes[0] * x) / coeficientes[1];
-            trace.x.push(x);
-            trace.y.push(y);
+        const xMax = 15; // Ajustar para a escala desejada
+        const yMax = 15;
+
+        // Adicionando ponto em X1 = 0, X2 variável
+        if (Math.abs(coeficientes[0]) < 0.0001) {
+            for (let y = 0; y <= yMax; y += 0.1) {
+                let x = rhs / coeficientes[1];
+                if (x >= 0) {
+                    trace.x.push(x);
+                    trace.y.push(y);
+                }
+            }
+        } else if (Math.abs(coeficientes[1]) < 0.0001) {
+            // Adicionando ponto em X2 = 0, X1 variável
+            for (let x = 0; x <= xMax; x += 0.1) {
+                let y = rhs / coeficientes[0];
+                if (y >= 0) {
+                    trace.x.push(x);
+                    trace.y.push(y);
+                }
+            }
+        } else {
+            // Gerar pontos para coeficientes normais de X1 e X2
+            for (let x = 0; x <= xMax; x += 0.1) {
+                let y = (rhs - coeficientes[0] * x) / coeficientes[1];
+                if (y >= 0) { // Garantir que y seja maior ou igual a 0
+                    trace.x.push(x);
+                    trace.y.push(y);
+                }
+            }
         }
 
         traces.push(trace);
 
-        // Adicionar shapes para áreas sombreadas
-        const shape = {
-            type: 'path',
-            path: getPath(coeficientes, rhs), // Função para obter o caminho do shape
-            fillcolor: 'rgba(0, 0, 255, 0.2)', // Cor e opacidade da área sombreada
-            line: {
-                width: 0 // Sem linha de contorno do shape
-            }
-        };
+        // Adicionar shapes para áreas sombreadas apenas para <= e >=
+        if (tipo === '<=') {
+            const shape = {
+                type: 'path',
+                path: getPath(coeficientes, rhs, tipo), // Função para obter o caminho do shape
+                fillcolor: 'rgba(0, 0, 255, 0.2)', // Cor e opacidade da área sombreada
+                line: {
+                    width: 1 // Sem linha de contorno do shape
+                }
+            };
 
-        shapes.push(shape);
+            shapes.push(shape);
+        } else if (tipo === '>=') {
+            const shape = {
+                type: 'path',
+                path: getPath(coeficientes, rhs, tipo), // Função para obter o caminho do shape
+                fillcolor: 'rgba(255, 0, 0, 0.2)', // Cor e opacidade da área sombreada
+                line: {
+                    width: 1 // Sem linha de contorno do shape
+                }
+            };
+
+            shapes.push(shape);
+        }
     });
 
     // Adicionar interseções entre as restrições se houver mais de duas
@@ -76,8 +115,8 @@ document.addEventListener("DOMContentLoaded", function() {
     const layout = {
         xaxis: {
             title: 'X1',
-            range: [0, 5 * Math.max(...dados.restricoes.map(r => r[r.length - 1]))], // Ajustar limite do eixo x
-            dtick: 10, // Incremento de 10 no eixo x
+            range: [0, 15], // Ajustar limite do eixo x
+            dtick: 1, // Incremento de 1 no eixo x
             zeroline: false, // Remover linha do zero
             ticksuffix: '', // Remover o sinal de menos dos ticks negativos
             showline: true, // Mostrar linha do eixo x
@@ -85,8 +124,8 @@ document.addEventListener("DOMContentLoaded", function() {
         },
         yaxis: {
             title: 'X2',
-            range: [0, 5 * Math.max(...dados.restricoes.map(r => r[r.length - 1]))], // Ajustar limite do eixo y
-            dtick: 10, // Incremento de 10 no eixo y
+            range: [0, 15], // Ajustar limite do eixo y
+            dtick: 1, // Incremento de 1 no eixo y
             zeroline: false, // Remover linha do zero
             ticksuffix: '', // Remover o sinal de menos dos ticks negativos
             showline: true, // Mostrar linha do eixo y
@@ -98,10 +137,8 @@ document.addEventListener("DOMContentLoaded", function() {
         shapes: shapes // Adicionar os shapes ao layout
     };
 
-    // Plotar o gráfico usando Plotly
     Plotly.newPlot('myPlot', traces, layout);
 
-    // Função para encontrar interseção entre duas restrições
     function encontrarIntersecao(restricao1, restricao2) {
         const coeficientes1 = restricao1.slice(1, -1);
         const rhs1 = restricao1[restricao1.length - 1];
@@ -117,7 +154,6 @@ document.addEventListener("DOMContentLoaded", function() {
         return { x: x, y: y };
     }
 
-    // Função para obter cor aleatória - mó bagunça
     function getRandomColor() {
         const letters = '0123456789ABCDEF';
         let color = '#';
@@ -127,40 +163,61 @@ document.addEventListener("DOMContentLoaded", function() {
         return color;
     }
 
-    // Função para obter o caminho do shape da área sombreada
-    function getPath(coeficientes, rhs) {
-        const xMax = 5 * rhs;
-        let path = `M 0,0`;
+    function getPath(coeficientes, rhs, tipo) {
+        const xMax = 15; // Limite de x para visualização
+        const yMax = 15;
 
-        if (coeficientes[1] !== 0) {
-            const yMin = (rhs - coeficientes[0] * 0) / coeficientes[1];
-            path += ` L 0,${yMin}`;
-        } else {
-            // Coeficiente de x2 é zero, então a reta é quase paralela ao eixo y
-            path += ` L 0,0.0001`; // Vai até um valor muito próximo de zero no eixo y
-        }
-
-        for (let x = 0; x <= xMax; x += 0.1) {
-            if (coeficientes[1] !== 0) {
-                const y = (rhs - coeficientes[0] * x) / coeficientes[1];
-                path += ` L ${x},${y}`;
-            } else {
-                // Se coeficiente de x2 é zero, a reta é quase paralela ao eixo y
-                path += ` L ${x},0.0001`; // Continua em um valor muito próximo de zero no eixo y
+        if (tipo === '<=') {
+            let path = `M 0,0`;
+            for (let x = 0; x <= xMax; x += 0.1) {
+                let y;
+                if (coeficientes[1] !== 0) {
+                    y = (rhs - coeficientes[0] * x) / coeficientes[1];
+                    if (y >= 0) { // Garantir que y seja maior ou igual a 0
+                        path += ` L ${x},${y}`;
+                    }
+                } else {
+                    y = rhs / coeficientes[0]; // Para coeficiente x2 = 0, calculamos y no eixo x1
+                    if (y >= 0) { // Garantir que y seja maior ou igual a 0
+                        path += ` L ${x},${y}`;
+                    }
+                }
             }
-        }
-
-        if (coeficientes[0] !== 0) {
-            const xFinal = rhs / coeficientes[0];
-            path += ` L ${xFinal},0`;
+            return path + ` L ${xMax},0 Z`;
+        } else if (tipo === '>=') {
+            let path = `M 0,${yMax}`;
+            for (let x = 0; x <= xMax; x += 0.1) {
+                let y;
+                if (coeficientes[1] !== 0) {
+                    y = (rhs - coeficientes[0] * x) / coeficientes[1];
+                    if (y >= 0) { // Garantir que y seja maior ou igual a 0
+                        path += ` L ${x},${y}`;
+                    }
+                } else {
+                    y = yMax; // Para coeficiente x2 = 0, continuamos na altura máxima definida
+                    path += ` L ${x},${y}`;
+                }
+            }
+            return path + ` L ${xMax},${yMax} Z`;
         } else {
-            // Coeficiente de x1 é zero, então a reta é quase paralela ao eixo x2
-            path += ` L 0.0001,0`; // Vai até um valor muito próximo de zero no eixo x1
+            // Se tipo === '=', retorna apenas a linha, sem área sombreada
+            let path = `M 0,0`;
+            for (let x = 0; x <= xMax; x += 0.1) {
+                let y;
+                if (coeficientes[1] !== 0) {
+                    y = (rhs - coeficientes[0] * x) / coeficientes[1];
+                    if (y >= 0) { // Garantir que y seja maior ou igual a 0
+                        path += ` L ${x},${y}`;
+                    }
+                } else {
+                    y = rhs / coeficientes[0]; // Para coeficiente x2 = 0, calculamos y no eixo x1
+                    if (y >= 0) { // Garantir que y seja maior ou igual a 0
+                        path += ` L ${x},${y}`;
+                    }
+                }
+            }
+            return path;
         }
-
-        path += ` Z`;
-
-        return path;
     }
 });
 
