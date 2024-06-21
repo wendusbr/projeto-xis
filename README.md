@@ -1,7 +1,7 @@
 # <img src="frontend/assets/img/logo.png">
 
 ### Descrição
-> XIS é um projeto acadêmico com dashboard voltado para resolução de problemas de programação linear tanto para maximização quanto minimização. Seu objetivo inicial é trabalhar com método tabular a partir do algoritmo simplex e suas variações.
+> XIS é um projeto acadêmico com dashboard voltado para resolução de problemas de programação linear tanto para maximização quanto minimização. Seu objetivo inicial é trabalhar com método tabular a partir do algoritmo Simplex e suas variações.
 
 ### Front-end
 <img src="https://img.shields.io/badge/html5-%23E34F26.svg?style=for-the-badge&logo=html5&logoColor=white"> <img src="https://img.shields.io/badge/css3-%231572B6.svg?style=for-the-badge&logo=css3&logoColor=white"> <img src="https://img.shields.io/badge/javascript-%23323330.svg?style=for-the-badge&logo=javascript&logoColor=%23F7DF1E">
@@ -11,7 +11,7 @@
 
 ### Funcionalidades
 - [x] Tabela dinâmica de entrada de dados.
-- [x] Solução método simplex.
+- [x] Solução método Simplex.
 - [x] Solução método Big-M.
 - [x] Plotagem do gráfico para problemas de até 2 variáveis.
 
