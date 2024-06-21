@@ -176,7 +176,6 @@ $(document).ready(() =>{
             return;
         }
     
-        debugger;
         if ((activeElements.attr('id') == "a2") && (numVariaveis === 2) && !($('#lin2').hasClass('disabled'))) {
             EnviarParaMetodoGrafico(novoObjeto);
         } else if (activeElements.attr('id') == "a3") {

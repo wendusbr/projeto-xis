@@ -54,7 +54,6 @@ function simplexMethod(entrada){
                     restricao.push(entrada.restricoes[i][j]);
                 }
                 else{
-                    console.log(entrada.restricoes[i][0]);
                     switch(entrada.restricoes[i][0]){
                         case '<=':
                             if(identidade+1 == j){
